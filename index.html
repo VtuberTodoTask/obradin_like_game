@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>漁り屋 — シェルター推理</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">ASARIYA</span>
+        <span class="brand-sub">漁り屋</span>
+      </div>
+      <div class="conn" id="connInfo"></div>
+      <div class="narr-info" id="narrInfo"></div>
+      <div class="alert-meter" id="alertMeter" title="管理AIの侵入検知の警戒度"></div>
+      <div class="top-actions">
+        <button id="btnLLM" class="btn" hidden>LLMで文章化</button>
+        <button id="btnAnswer" class="btn primary">最終回答</button>
+        <button id="btnNew" class="btn">新しいシナリオ</button>
+        <button id="btnDev" class="btn ghost">検証器</button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <aside class="col docs" id="docList"></aside>
+      <section class="col viewer" id="viewer"></section>
+      <aside class="col side">
+        <section class="panel terminal">
+          <h2>ID 認証</h2>
+          <form id="unlockForm" autocomplete="off">
+            <input id="idInput" placeholder="例 C-07-31" spellcheck="false" />
+            <button class="btn primary" type="submit">送信</button>
+          </form>
+          <p class="hint">区画 - 入居順 - 職能コード。誤った ID は警戒度を上げる。</p>
+          <ol class="term-log" id="termLog"></ol>
+        </section>
+        <section class="panel people">
+          <h2>人物索引 <span class="sub" id="peopleCount"></span></h2>
+          <div class="tok-grid" id="tokGrid"></div>
+          <div class="tok-detail" id="tokDetail"></div>
+        </section>
+      </aside>
+    </main>
+
+    <dialog id="answerDlg" class="dlg wide">
+      <div class="dlg-head">
+        <h2>最終回答</h2>
+        <button class="btn ghost" data-close>閉じる</button>
+      </div>
+      <p class="dlg-note">全住人の生死と死因（殺人なら加害者）、そしてシェルターの安全判定を提出する。提出は一度きりで、提出すると真相が開示される。身元は ID の解読によって判定される。</p>
+      <div class="table-wrap"><table class="answer-table" id="answerTable"></table></div>
+      <fieldset class="verdict" id="verdictBox"></fieldset>
+      <div class="dlg-foot">
+        <button class="btn ghost" data-close>戻る</button>
+        <button class="btn primary" id="btnSubmit">提出する</button>
+      </div>
+    </dialog>
+
+    <dialog id="resultDlg" class="dlg wide">
+      <div class="dlg-head">
+        <h2 id="resultTitle">結果</h2>
+        <button class="btn ghost" data-close>閉じる</button>
+      </div>
+      <div id="resultBody"></div>
+      <div class="dlg-foot">
+        <button class="btn" id="btnRetry">同じシナリオをやり直す</button>
+        <button class="btn primary" id="btnNext">新しいシナリオ</button>
+      </div>
+    </dialog>
+
+    <dialog id="devDlg" class="dlg wide">
+      <div class="dlg-head">
+        <h2>検証器（開発用）</h2>
+        <button class="btn ghost" data-close>閉じる</button>
+      </div>
+      <div id="devBody"></div>
+    </dialog>
+
+    <dialog id="llmDlg" class="dlg">
+      <div class="dlg-head"><h2 id="llmTitle">主観ログを復元中</h2></div>
+      <div class="llm-body">
+        <p class="muted">管理AIから抜き出した記録を、LLM が住人それぞれの語り口で文章にしている。書き漏らしや書きすぎがないか、別の呼び出しで照合してから表示する。</p>
+        <div class="progress"><div class="bar" id="llmBar"></div></div>
+        <p id="llmStatus" class="mono"></p>
+        <p id="llmActivity" class="mono muted"></p>
+        <div id="llmError" hidden></div>
+      </div>
+      <div class="dlg-foot">
+        <button class="btn" id="btnLLMCancel">中断してテンプレート文で遊ぶ</button>
+        <button class="btn" id="btnLLMTemplate" hidden>テンプレート文を使う</button>
+        <button class="btn primary" id="btnLLMRetry" hidden>さらに再検証する</button>
+      </div>
+    </dialog>
+
+    <script src="js/config.js"></script>
+    <!-- API キーなどのローカル設定（git 管理外）。無ければ読み込みに失敗するだけで、テンプレート文で動く -->
+    <script src="js/config.local.js"></script>
+    <script src="js/util.js"></script>
+    <script src="js/solver.js"></script>
+    <script src="js/tricks.js"></script>
+    <script src="js/narrator.js"></script>
+    <script src="js/culture.js"></script>
+    <script src="js/story.js"></script>
+    <script src="js/generator.js"></script>
+    <script src="js/llm.js"></script>
+    <script src="js/game.js"></script>
+  </body>
+</html>
