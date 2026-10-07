@@ -9,7 +9,7 @@ window.ASARIYA_LOCAL = {
     // verifyModel: 'gpt-5-mini', // 往復検証（事実の抽出）に使うモデル。省略すると model と同じ
     reasoningEffort: 'low', // 推論モデル用の設定。推論しないモデル（gpt-4.1 系など）を使う場合はこの行を消す
     concurrency: 4, // 同時に処理する主観ログの数
-    maxRounds: 3, // 往復検証に落ちたときの最大試行回数（それでも駄目なら、再検証するかテンプレート文を使うかを選ぶ）
+    repairRounds: 2, // 全文生成の不合格エントリを局所修正する回数。モデル設定はそのまま使う
     timeoutSec: 120, // 1回のリクエストの制限時間（秒）。超えたら打ち切って再送する
     autoNarrate: true, // シナリオ生成後に自動で LLM 文章化する
   },

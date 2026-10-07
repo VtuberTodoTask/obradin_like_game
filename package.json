@@ -1,0 +1,13 @@
+{
+  "name": "asariya",
+  "version": "2.1.0",
+  "private": true,
+  "scripts": {
+    "test": "node --test tools/regression.test.js tools/semantic.test.js",
+    "check": "node tools/batch-check.js 1 100",
+    "test:browser": "node tools/browser-check.js"
+  },
+  "devDependencies": {
+    "playwright": "1.63.0"
+  }
+}

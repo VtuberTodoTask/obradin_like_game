@@ -1,4 +1,5 @@
-// LLM による文章化（設計書 §10）— OpenAI API 版
+// OpenAI呼び出し・設定・キャッシュ。現行v2.1の全文生成・意味検証は narration.js へ委譲する。
+// 以下の場面生成の説明と実装は旧プロトタイプの履歴（現行形式では呼ばない）。
 //
 // 論理層（真相・手がかり事実・物語の正本）はすでに生成・検証済みのシナリオに対して、主観ログの文章だけを差し替える。
 //  1. 生成の単位は「場面」。同じ場面を記録する書き手全員を1回の呼び出しでまとめて書かせる（事実は揃え、視点は書き分ける）。
@@ -19,7 +20,7 @@
   const TOKEN_RE = /\{P:([A-D]-\d{2}-\d{2})\}/g;
   const ALIAS_RE = /[<＜]\s*[PＰ]\s*([0-9０-９]+)\s*[>＞]/g;
   const ID_RE = /[A-D]-\d{2}-\d{2}/;
-  const CACHE_VERSION = 4;
+  const CACHE_VERSION = 6;
 
   // ------------------------------------------------------------------ 設定
 
@@ -35,6 +36,7 @@
       baseUrl: (o.baseUrl || 'https://api.openai.com/v1').replace(/\/$/, ''),
       concurrency: o.concurrency || 4,
       maxRounds: o.maxRounds || 3,
+      repairRounds: o.repairRounds ?? Math.max(0, (o.maxRounds || 3) - 1),
       timeoutSec: o.timeoutSec || 120,
       autoNarrate: o.autoNarrate !== false,
       testIncludeDraft: !!o.testIncludeDraft, // テスト専用：API のスタブが下書きを返せるよう、下書きを _draft として添える
@@ -109,6 +111,7 @@
         stats.emit();
       }
       if (!res) {
+        if (attempt >= 4) throw new LLMError('通信が繰り返し失敗しました。テンプレート文で継続できます。', 0, false);
         await sleep(1000 * 2 ** attempt, signal);
         continue;
       }
@@ -771,7 +774,7 @@ problem は日本語で書く。矛盾がなければ contradictions は空の�
   // ------------------------------------------------------------------ キャッシュと状態
 
   function cacheKey(sc, s) {
-    return `asariya:llm:v${CACHE_VERSION}:${sc.meta.seed}:${s.model}`;
+    return `asariya:llm:v${CACHE_VERSION}:${sc.meta.version}:${sc.meta.fixed ? 'fixed' : sc.meta.seed}:${sc.meta.size}:${s.model}:${s.verifyModel}:${A.Semantics?.VERSION}:${A.Semantics?.PROMPT}:${A.util.scenarioFingerprint(sc)}`;
   }
   function loadCache(sc, s) {
     let c = null;
@@ -813,19 +816,52 @@ problem は日本語で書く。矛盾がなければ contradictions は空の�
   }
   const pendingCount = (sc) => countEntries(sc).pending;
 
+  function fallbackRecord(sc, owner, index, error) {
+    const e = sc.documents.chip_logs[owner][index];
+    return { owner, index, timestamp: e.timestamp,
+      scene: sc.story.scenes.find((scene) => scene.id === e.scene), required: (e.draft || e.text).split('\n'),
+      codes: error?.codes || ['cached_fallback'],
+      problems: error?.problems || ['以前の文章化で不合格となり、テンプレートへ復帰した。旧キャッシュには個別の理由が保存されていない。'] };
+  }
+  function diagnostics(sc) {
+    const counts = countEntries(sc), errors = [], records = [];
+    for (const [owner, es] of Object.entries(sc.documents.chip_logs)) es.forEach((e, index) => {
+      if (!e.deleted && e.narrator === 'template') errors.push(fallbackRecord(sc, owner, index, e.narrationError));
+      if (!e.deleted && e.narrationDiagnostic) records.push(e.narrationDiagnostic);
+    });
+    const status = counts.template ? '不合格あり（テンプレートへ復帰）' : counts.llm
+      ? counts.pending ? '処理途中' : 'PASS' : '未実施';
+    return { counts, errors, status, records, metrics: A.Narration ? A.Narration.metrics(records) : null };
+  }
+
   // キャッシュ済みの文章と、正本に書き戻した細部を当てる（API は呼ばない）
   function applyCache(sc) {
     if (typeof localStorage === 'undefined') return 0;
     const cache = loadCache(sc, settings());
     let n = 0;
+    if (sc.meta.generator === 'incident-v2') {
+      const items = Object.entries(sc.documents.chip_logs).flatMap(([owner, es]) => es.map((e, i) => ({ owner, e, i }))).sort((a, b) => a.e.t - b.e.t);
+      for (const { owner, e, i } of items) {
+        const c = cache.entries[`${owner}#${i}`], draft = e.draft || e.text;
+        if (!c || e.deleted || c.draft !== draft || e.narrator) continue;
+        e.draft = draft;
+        if (A.Narration.applyEntryCache(sc, owner, i, c) && e.narrator === 'llm') n++;
+      }
+      return n;
+    }
     for (const [owner, es] of Object.entries(sc.documents.chip_logs)) {
       es.forEach((e, i) => {
         const c = cache.entries[`${owner}#${i}`];
         const draft = e.draft || e.text;
         if (!c || e.deleted || c.draft !== draft || e.narrator) return;
         e.draft = draft;
+        if (sc.meta.generator === 'incident-v2') {
+          if (A.Narration.applyEntryCache(sc, owner, i, c)) { if (e.narrator === 'llm') n++; }
+          return;
+        }
         if (c.failed) {
           e.narrator = 'template'; // 前回テンプレート文で確定したものは再送しない（作り直しはキャッシュを消してから）
+          e.narrationError = c.error;
         } else {
           e.text = c.text;
           e.narrator = 'llm';
@@ -861,6 +897,7 @@ problem は日本語で書く。矛盾がなければ contradictions は空の�
   const RETRY_CALL_SIZE = 2; // 言い直しは少ない件数ずつ呼ぶ（まとめて生成したときの書き落としを、言い直しで繰り返さないため）
 
   async function narrateScenario(sc, opts = {}) {
+    if (sc.meta.generator === 'incident-v2') return A.Narration.run(sc, opts);
     const s = settings();
     if (!isConfigured()) throw new LLMError('OpenAI の API キーが設定されていません（js/config.local.js）', 0, true);
     if (!sc.story || !sc.story.scenes) throw new LLMError('このシナリオには物語の正本（story）がありません。生成し直してください', 0, true);
@@ -1495,8 +1532,9 @@ problem は日本語で書く。矛盾がなければ contradictions は空の�
       const e = sc.documents.chip_logs[u.owner][u.index];
       if (!e || e.narrator) continue;
       e.narrator = 'template';
+      e.narrationError = { codes: u.codes || ['validation_failed'], problems: u.problems };
       feedbackMemo.delete(e);
-      cache.entries[`${u.owner}#${u.index}`] = { draft: e.draft || e.text, failed: true };
+      cache.entries[`${u.owner}#${u.index}`] = { draft: e.draft || e.text, failed: true, error: e.narrationError };
     }
     if (useCache) saveCache(sc, s, cache);
   }
@@ -1507,10 +1545,15 @@ problem は日本語で書く。矛盾がなければ contradictions は空の�
       for (const e of es) {
         if (e.draft) e.text = e.draft;
         delete e.narrator;
+        delete e.atmosphere;
+        delete e.narrationError;
+        delete e.semantic;
+        delete e.narrationDiagnostic;
       }
     }
     if (sc.story) sc.story.scenes.forEach((s) => (s.details = []));
   }
 
-  A.LLM = { settings, isConfigured, narrateScenario, useTemplate, applyCache, clearCache, countEntries, pendingCount, revertToTemplate, averageOverlap, overlapRate, LLMError };
+  A.LLM = { settings, isConfigured, narrateScenario, useTemplate, applyCache, clearCache, countEntries, pendingCount, diagnostics, loadCache: (sc) => loadCache(sc, settings()), saveCache: (sc, cache) => saveCache(sc, settings(), cache),
+    requestJSON: (request, stats) => chatJSON(settings(), stats, request), revertToTemplate, averageOverlap, overlapRate, LLMError };
 })(window.ASARIYA = window.ASARIYA || {});

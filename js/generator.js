@@ -671,5 +671,6 @@
     };
   }
 
+  A.LegacyGenerator = { generate };
   A.Generator = { generate };
 })(window.ASARIYA = window.ASARIYA || {});

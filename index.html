@@ -35,6 +35,7 @@
           </form>
           <p class="hint">区画 - 入居順 - 職能コード。誤った ID は警戒度を上げる。</p>
           <ol class="term-log" id="termLog"></ol>
+          <button class="btn" id="btnReconnect" hidden>再接続</button>
         </section>
         <section class="panel people">
           <h2>人物索引 <span class="sub" id="peopleCount"></span></h2>
@@ -54,6 +55,8 @@
       <fieldset class="verdict" id="verdictBox"></fieldset>
       <div class="dlg-foot">
         <button class="btn ghost" data-close>戻る</button>
+        <span id="confirmStatus" aria-live="polite"></span>
+        <button class="btn" id="btnConfirm">3人まとめて途中確認</button>
         <button class="btn primary" id="btnSubmit">提出する</button>
       </div>
     </dialog>
@@ -104,7 +107,13 @@
     <script src="js/culture.js"></script>
     <script src="js/story.js"></script>
     <script src="js/generator.js"></script>
+    <script src="js/evidence.js"></script>
+    <script src="js/semantics.js"></script>
+    <script src="js/inference.js"></script>
+    <script src="js/scenarios.js"></script>
+    <script src="js/investigation.js"></script>
     <script src="js/llm.js"></script>
+    <script src="js/narration.js"></script>
     <script src="js/game.js"></script>
   </body>
 </html>

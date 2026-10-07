@@ -1,0 +1,903 @@
+{
+  "seed": 730,
+  "fixed": true,
+  "evidenceVersion": "semantic-3",
+  "note": "Saved LLM extraction/audit replay is not a new measurement of model reliability. Controlled sample is explicitly marked.",
+  "cases": [
+    {
+      "name": "natural-number",
+      "origin": "saved-real-api",
+      "source": "docs/ai/narration-current.json",
+      "entryId": "A-01-51#2",
+      "promptVersion": "whole-log-2",
+      "text": "入居台帳には、<P1>が受付順で3番と記されていた。",
+      "references": {
+        "{P:C-03-31}": "<P1>",
+        "{P:A-01-51}": "<P2>"
+      },
+      "expected": [
+        {
+          "evidence_id": "e4",
+          "predicate": "NUMBER",
+          "args": {
+            "p": "C-03-31",
+            "n": 3
+          },
+          "subject": "C-03-31",
+          "object": null,
+          "observer": "A-01-51",
+          "source_kind": "document",
+          "modality": "observed",
+          "polarity": "affirmative",
+          "qualifiers": {},
+          "time": null,
+          "interval": null,
+          "value": 3,
+          "unit": null,
+          "required_precision": "relation",
+          "epistemic_scope": "指定された情報源が示す範囲。発言は事実へ昇格しない。他人の内面を創作しない。",
+          "critical_fields": [
+            "p",
+            "n",
+            "source_kind",
+            "modality",
+            "polarity"
+          ]
+        }
+      ],
+      "extraction": {
+        "observations": [
+          {
+            "type": "NUMBER",
+            "fields": [
+              {
+                "key": "p",
+                "value": "<P1>"
+              },
+              {
+                "key": "n",
+                "value": "3"
+              }
+            ],
+            "qualifiers": [],
+            "source_kind": "document",
+            "modality": "observed",
+            "polarity": "affirmative",
+            "quote": "入居台帳には、<P1>が受付順で3番と記されていた。"
+          }
+        ],
+        "additions": []
+      },
+      "audit": {
+        "grounding": [
+          {
+            "index": 0,
+            "supported": true,
+            "quote": "入居台帳には、<P1>が受付順で3番と記されていた。",
+            "reason": "引用は入居台帳に<P1>の受付順が3番と記載されていることを示しており、抽出された人物・数値・情報源・肯定性を支えています。"
+          }
+        ],
+        "equivalences": [
+          {
+            "index": 0,
+            "field": "p",
+            "expected": "<P1>",
+            "actual": "<P1>",
+            "equivalent": true,
+            "quote": "<P1>"
+          },
+          {
+            "index": 0,
+            "field": "n",
+            "expected": "3",
+            "actual": "3",
+            "equivalent": true,
+            "quote": "3番"
+          },
+          {
+            "index": 0,
+            "field": "source_kind",
+            "expected": "document",
+            "actual": "document",
+            "equivalent": true,
+            "quote": "入居台帳"
+          },
+          {
+            "index": 0,
+            "field": "modality",
+            "expected": "observed",
+            "actual": "observed",
+            "equivalent": true,
+            "quote": "入居台帳には、<P1>が受付順で3番と記されていた。"
+          },
+          {
+            "index": 0,
+            "field": "polarity",
+            "expected": "affirmative",
+            "actual": "affirmative",
+            "equivalent": true,
+            "quote": "3番と記されていた"
+          }
+        ],
+        "additions": [],
+        "quality": [],
+        "uncertain": false
+      },
+      "expectedDecision": true,
+      "result": {
+        "pass": true,
+        "issues": [],
+        "observations": [
+          {
+            "type": "NUMBER",
+            "args": {
+              "p": "C-03-31",
+              "n": 3
+            },
+            "quote": "入居台帳には、{P:C-03-31}が受付順で3番と記されていた。",
+            "source_kind": "document",
+            "modality": "observed",
+            "polarity": "affirmative"
+          }
+        ],
+        "quality": []
+      }
+    },
+    {
+      "name": "equivalent-adjacency",
+      "origin": "saved-real-api",
+      "source": "docs/ai/narration-current.json",
+      "entryId": "B-02-51#2",
+      "promptVersion": "whole-log-2",
+      "text": "入居台帳の受付順を見た。そこには、<P2>の入居が<P1>の直前に記録されていた。",
+      "references": {
+        "{P:A-04-23}": "<P1>",
+        "{P:C-03-31}": "<P2>",
+        "{P:B-02-51}": "<P3>"
+      },
+      "expected": [
+        {
+          "evidence_id": "e7",
+          "predicate": "PREVIOUS",
+          "args": {
+            "p": "C-03-31",
+            "q": "A-04-23"
+          },
+          "subject": "C-03-31",
+          "object": "A-04-23",
+          "observer": "B-02-51",
+          "source_kind": "document",
+          "modality": "observed",
+          "polarity": "affirmative",
+          "qualifiers": {},
+          "time": null,
+          "interval": null,
+          "value": null,
+          "unit": null,
+          "required_precision": "relation",
+          "epistemic_scope": "指定された情報源が示す範囲。発言は事実へ昇格しない。他人の内面を創作しない。",
+          "critical_fields": [
+            "p",
+            "q",
+            "source_kind",
+            "modality",
+            "polarity"
+          ]
+        }
+      ],
+      "extraction": {
+        "observations": [
+          {
+            "type": "NEXT",
+            "fields": [
+              {
+                "key": "q",
+                "value": "<P2>"
+              },
+              {
+                "key": "p",
+                "value": "<P1>"
+              }
+            ],
+            "qualifiers": [],
+            "source_kind": "document",
+            "modality": "observed",
+            "polarity": "affirmative",
+            "quote": "入居台帳の受付順を見た。そこには、<P2>の入居が<P1>の直前に記録されていた。"
+          }
+        ],
+        "additions": []
+      },
+      "audit": {
+        "grounding": [
+          {
+            "index": 0,
+            "supported": true,
+            "quote": "<P2>の入居が<P1>の直前に記録されていた。",
+            "reason": "台帳の記録として、<P2>が<P1>の直前に入居した関係を示している。抽出されたNEXT（p=<P1>、q=<P2>）は、定義上pがqの直後なので、この関係を表す。"
+          }
+        ],
+        "equivalences": [
+          {
+            "index": 0,
+            "field": "p",
+            "expected": "<P2>",
+            "actual": "<P1>",
+            "equivalent": false,
+            "quote": "<P2>の入居が<P1>の直前に記録されていた。"
+          },
+          {
+            "index": 0,
+            "field": "q",
+            "expected": "<P1>",
+            "actual": "<P2>",
+            "equivalent": false,
+            "quote": "<P2>の入居が<P1>の直前に記録されていた。"
+          },
+          {
+            "index": 0,
+            "field": "source_kind",
+            "expected": "document",
+            "actual": "document",
+            "equivalent": true,
+            "quote": "入居台帳の受付順を見た。"
+          },
+          {
+            "index": 0,
+            "field": "modality",
+            "expected": "observed",
+            "actual": "observed",
+            "equivalent": true,
+            "quote": "入居台帳の受付順を見た。"
+          },
+          {
+            "index": 0,
+            "field": "polarity",
+            "expected": "affirmative",
+            "actual": "affirmative",
+            "equivalent": true,
+            "quote": "<P2>の入居が<P1>の直前に記録されていた。"
+          }
+        ],
+        "additions": [],
+        "quality": [],
+        "uncertain": false
+      },
+      "expectedDecision": true,
+      "result": {
+        "pass": true,
+        "issues": [],
+        "observations": [
+          {
+            "type": "PREVIOUS",
+            "args": {
+              "p": "C-03-31",
+              "q": "A-04-23"
+            },
+            "quote": "入居台帳の受付順を見た。そこには、{P:C-03-31}の入居が{P:A-04-23}の直前に記録されていた。",
+            "source_kind": "document",
+            "modality": "observed",
+            "polarity": "affirmative"
+          }
+        ],
+        "quality": []
+      }
+    },
+    {
+      "name": "automatic-switch-record",
+      "origin": "saved-real-api",
+      "source": "docs/ai/narration-qualification.json",
+      "entryId": "A-04-23#4",
+      "promptVersion": "whole-log-3",
+      "text": "私は端末の自動履歴で、D04 10:00に隔離盤白のシリアル707が遮断を解除して通電したことを確かめた。これは電気の専任資格を持つ者による操作で、ほかの操作はなかった。仲間を救うため、どうか守りをお与えください。",
+      "references": {
+        "{P:A-04-23}": "<P1>",
+        "{P:C-03-31}": "<P2>"
+      },
+      "expected": [
+        {
+          "evidence_id": "e27",
+          "predicate": "SWITCH",
+          "args": {
+            "t": 4920,
+            "device": "隔離盤白",
+            "serial": "707",
+            "operation": "遮断を解除し通電",
+            "qualification": "電気の専任資格"
+          },
+          "subject": null,
+          "object": null,
+          "observer": "A-04-23",
+          "source_kind": "machine",
+          "modality": "observed",
+          "polarity": "affirmative",
+          "qualifiers": {
+            "qualified": true,
+            "no_other_operation": true
+          },
+          "time": 4920,
+          "interval": null,
+          "value": "707",
+          "unit": null,
+          "required_precision": "minute",
+          "epistemic_scope": "指定された情報源が示す範囲。発言は事実へ昇格しない。他人の内面を創作しない。",
+          "critical_fields": [
+            "t",
+            "device",
+            "serial",
+            "operation",
+            "qualification",
+            "source_kind",
+            "modality",
+            "polarity",
+            "qualified",
+            "no_other_operation"
+          ]
+        }
+      ],
+      "extraction": {
+        "observations": [
+          {
+            "type": "SWITCH",
+            "fields": [
+              {
+                "key": "t",
+                "value": "D04 10:00"
+              },
+              {
+                "key": "device",
+                "value": "隔離盤白"
+              },
+              {
+                "key": "serial",
+                "value": "707"
+              },
+              {
+                "key": "operation",
+                "value": "遮断を解除して通電した"
+              },
+              {
+                "key": "qualification",
+                "value": "電気の専任資格"
+              }
+            ],
+            "qualifiers": [
+              {
+                "key": "qualified",
+                "value": true
+              },
+              {
+                "key": "no_other_operation",
+                "value": true
+              }
+            ],
+            "source_kind": "machine",
+            "modality": "observed",
+            "polarity": "affirmative",
+            "quote": "私は端末の自動履歴で、D04 10:00に隔離盤白のシリアル707が遮断を解除して通電したことを確かめた。これは電気の専任資格を持つ者による操作で、ほかの操作はなかった。"
+          }
+        ],
+        "additions": [
+          {
+            "kind": "祈願・目的の表現",
+            "quote": "仲間を救うため、どうか守りをお与えください。",
+            "reason": "仲間を救う意図を示す祈願であり、救助の実行や他の事件事実を示す証拠ではない。"
+          }
+        ]
+      },
+      "audit": {
+        "grounding": [
+          {
+            "index": 0,
+            "supported": true,
+            "quote": "私は端末の自動履歴で、D04 10:00に隔離盤白のシリアル707が遮断を解除して通電したことを確かめた。これは電気の専任資格を持つ者による操作で、ほかの操作はなかった。",
+            "reason": "自動履歴を実際に確認したと述べており、日時・機器・シリアル・操作・資格・情報源・観察としての認識を支えている。後半は資格保有者による操作と、ほかの操作がなかったことも明示している。"
+          }
+        ],
+        "equivalences": [
+          {
+            "index": 0,
+            "field": "t",
+            "expected": "D04 10:00",
+            "actual": "D04 10:00",
+            "equivalent": true,
+            "quote": "D04 10:00"
+          },
+          {
+            "index": 0,
+            "field": "device",
+            "expected": "隔離盤白",
+            "actual": "隔離盤白",
+            "equivalent": true,
+            "quote": "隔離盤白"
+          },
+          {
+            "index": 0,
+            "field": "serial",
+            "expected": "707",
+            "actual": "707",
+            "equivalent": true,
+            "quote": "シリアル707"
+          },
+          {
+            "index": 0,
+            "field": "operation",
+            "expected": "遮断を解除し通電",
+            "actual": "遮断を解除して通電した",
+            "equivalent": true,
+            "quote": "遮断を解除して通電した"
+          },
+          {
+            "index": 0,
+            "field": "qualification",
+            "expected": "電気の専任資格",
+            "actual": "電気の専任資格",
+            "equivalent": true,
+            "quote": "電気の専任資格を持つ者による操作"
+          },
+          {
+            "index": 0,
+            "field": "source_kind",
+            "expected": "machine",
+            "actual": "machine",
+            "equivalent": true,
+            "quote": "端末の自動履歴"
+          },
+          {
+            "index": 0,
+            "field": "modality",
+            "expected": "observed",
+            "actual": "observed",
+            "equivalent": true,
+            "quote": "確かめた"
+          },
+          {
+            "index": 0,
+            "field": "polarity",
+            "expected": "affirmative",
+            "actual": "affirmative",
+            "equivalent": true,
+            "quote": "遮断を解除して通電した"
+          },
+          {
+            "index": 0,
+            "field": "qualified",
+            "expected": "true",
+            "actual": "true",
+            "equivalent": true,
+            "quote": "電気の専任資格を持つ者による操作"
+          },
+          {
+            "index": 0,
+            "field": "no_other_operation",
+            "expected": "true",
+            "actual": "true",
+            "equivalent": true,
+            "quote": "ほかの操作はなかった"
+          }
+        ],
+        "additions": [
+          {
+            "kind": "allowed",
+            "quote": "仲間を救うため、どうか守りをお与えください。",
+            "reason": "許可された「仲間を救う」という目的と信心深い persona に沿った祈願であり、救助の実行や他の事件事実を追加していない。"
+          }
+        ],
+        "quality": [],
+        "uncertain": false
+      },
+      "expectedDecision": true,
+      "result": {
+        "pass": true,
+        "issues": [],
+        "observations": [
+          {
+            "type": "SWITCH",
+            "args": {
+              "t": 4920,
+              "device": "隔離盤白",
+              "serial": "707",
+              "operation": "遮断を解除し通電",
+              "qualification": "電気の専任資格"
+            },
+            "quote": "私は端末の自動履歴で、D04 10:00に隔離盤白のシリアル707が遮断を解除して通電したことを確かめた。これは電気の専任資格を持つ者による操作で、ほかの操作はなかった。",
+            "source_kind": "machine",
+            "modality": "observed",
+            "polarity": "affirmative"
+          }
+        ],
+        "quality": []
+      }
+    },
+    {
+      "name": "dedicated-key-document",
+      "origin": "saved-real-api",
+      "source": "docs/ai/narration-key-final.json",
+      "entryId": "A-01-51#5",
+      "promptVersion": "whole-log-4",
+      "text": "私は鍵の貸出票を確認した。専任資格の欄で<P1>の資格を照合できた。鍵707はD04 09:45から10:21まで<P1>に割り当てられ、重複も移管もない。仲間を救うための権限が、どうか正しく使われますように。",
+      "references": {
+        "{P:C-03-31}": "<P1>",
+        "{P:A-01-51}": "<P2>"
+      },
+      "expected": [
+        {
+          "evidence_id": "e25",
+          "predicate": "KEY",
+          "args": {
+            "p": "C-03-31",
+            "serial": "707",
+            "start": 4905,
+            "end": 4941,
+            "qualification": "専任資格"
+          },
+          "subject": "C-03-31",
+          "object": null,
+          "observer": "A-01-51",
+          "source_kind": "document",
+          "modality": "observed",
+          "polarity": "affirmative",
+          "qualifiers": {
+            "no_duplicate": true,
+            "no_transfer": true,
+            "qualified": true
+          },
+          "time": null,
+          "interval": [
+            4905,
+            4941
+          ],
+          "value": "707",
+          "unit": null,
+          "required_precision": "minute",
+          "epistemic_scope": "指定された情報源が示す範囲。発言は事実へ昇格しない。他人の内面を創作しない。",
+          "critical_fields": [
+            "p",
+            "serial",
+            "start",
+            "end",
+            "qualification",
+            "source_kind",
+            "modality",
+            "polarity",
+            "no_duplicate",
+            "no_transfer",
+            "qualified"
+          ]
+        }
+      ],
+      "extraction": {
+        "observations": [
+          {
+            "type": "KEY",
+            "fields": [
+              {
+                "key": "p",
+                "value": "<P1>"
+              },
+              {
+                "key": "qualification",
+                "value": "専任資格"
+              },
+              {
+                "key": "serial",
+                "value": "707"
+              },
+              {
+                "key": "start",
+                "value": "D04 09:45"
+              },
+              {
+                "key": "end",
+                "value": "D04 10:21"
+              }
+            ],
+            "qualifiers": [
+              {
+                "key": "no_duplicate",
+                "value": true
+              },
+              {
+                "key": "no_transfer",
+                "value": true
+              },
+              {
+                "key": "qualified",
+                "value": true
+              }
+            ],
+            "source_kind": "document",
+            "modality": "observed",
+            "polarity": "affirmative",
+            "quote": "私は鍵の貸出票を確認した。専任資格の欄で<P1>の資格を照合できた。鍵707はD04 09:45から10:21まで<P1>に割り当てられ、重複も移管もない。"
+          }
+        ],
+        "additions": [
+          {
+            "kind": "hope",
+            "quote": "仲間を救うための権限が、どうか正しく使われますように。",
+            "reason": "願いを表す主観的な記述であり、鍵の使用や事件の事実を示すものではない。"
+          }
+        ]
+      },
+      "audit": {
+        "grounding": [
+          {
+            "index": 0,
+            "supported": true,
+            "quote": "私は鍵の貸出票を確認した。専任資格の欄で<P1>の資格を照合できた。鍵707はD04 09:45から10:21まで<P1>に割り当てられ、重複も移管もない。",
+            "reason": "貸出票を確認したこと、資格欄で<P1>の資格を照合したこと、鍵707の割当先と時間、重複・移管がないことがそれぞれ明示されています。"
+          }
+        ],
+        "equivalences": [
+          {
+            "index": 0,
+            "field": "p",
+            "expected": "<P1>",
+            "actual": "<P1>",
+            "equivalent": true,
+            "quote": "鍵707はD04 09:45から10:21まで<P1>に割り当てられ"
+          },
+          {
+            "index": 0,
+            "field": "serial",
+            "expected": "707",
+            "actual": "707",
+            "equivalent": true,
+            "quote": "鍵707は"
+          },
+          {
+            "index": 0,
+            "field": "start",
+            "expected": "D04 09:45",
+            "actual": "D04 09:45",
+            "equivalent": true,
+            "quote": "D04 09:45から10:21まで"
+          },
+          {
+            "index": 0,
+            "field": "end",
+            "expected": "D04 10:21",
+            "actual": "D04 10:21",
+            "equivalent": true,
+            "quote": "D04 09:45から10:21まで"
+          },
+          {
+            "index": 0,
+            "field": "qualification",
+            "expected": "専任資格",
+            "actual": "専任資格",
+            "equivalent": true,
+            "quote": "専任資格の欄で<P1>の資格を照合できた"
+          },
+          {
+            "index": 0,
+            "field": "source_kind",
+            "expected": "document",
+            "actual": "document",
+            "equivalent": true,
+            "quote": "私は鍵の貸出票を確認した。"
+          },
+          {
+            "index": 0,
+            "field": "modality",
+            "expected": "observed",
+            "actual": "observed",
+            "equivalent": true,
+            "quote": "私は鍵の貸出票を確認した。"
+          },
+          {
+            "index": 0,
+            "field": "polarity",
+            "expected": "affirmative",
+            "actual": "affirmative",
+            "equivalent": true,
+            "quote": "鍵707はD04 09:45から10:21まで<P1>に割り当てられ"
+          },
+          {
+            "index": 0,
+            "field": "no_duplicate",
+            "expected": "true",
+            "actual": "true",
+            "equivalent": true,
+            "quote": "重複も"
+          },
+          {
+            "index": 0,
+            "field": "no_transfer",
+            "expected": "true",
+            "actual": "true",
+            "equivalent": true,
+            "quote": "移管もない。"
+          },
+          {
+            "index": 0,
+            "field": "qualified",
+            "expected": "true",
+            "actual": "true",
+            "equivalent": true,
+            "quote": "専任資格の欄で<P1>の資格を照合できた"
+          }
+        ],
+        "additions": [
+          {
+            "kind": "allowed",
+            "quote": "仲間を救うための権限が、どうか正しく使われますように。",
+            "reason": "願いを表す自己の主観的な記述であり、許可された「仲間を救う」という目標と信心深い人格の範囲にあります。鍵に関する新たな事実は主張していません。"
+          }
+        ],
+        "quality": [],
+        "uncertain": false
+      },
+      "expectedDecision": true,
+      "result": {
+        "pass": true,
+        "issues": [],
+        "observations": [
+          {
+            "type": "KEY",
+            "args": {
+              "p": "C-03-31",
+              "serial": "707",
+              "start": 4905,
+              "end": 4941,
+              "qualification": "専任資格"
+            },
+            "quote": "私は鍵の貸出票を確認した。専任資格の欄で{P:C-03-31}の資格を照合できた。鍵707はD04 09:45から10:21まで{P:C-03-31}に割り当てられ、重複も移管もない。",
+            "source_kind": "document",
+            "modality": "observed",
+            "polarity": "affirmative"
+          }
+        ],
+        "quality": []
+      }
+    },
+    {
+      "name": "350-changed-to-305",
+      "origin": "controlled-extraction-sample",
+      "entryId": "A-01-51#5",
+      "text": "<P1>が専任資格を照合して、番号305の青い印の操作鍵を受け取った。鍵は複製がなく、D04 09:45からD04 10:21まで他人へ渡されていない。",
+      "references": {
+        "{P:C-03-31}": "<P1>",
+        "{P:A-01-51}": "<P2>"
+      },
+      "expected": [
+        {
+          "evidence_id": "e25",
+          "predicate": "KEY",
+          "args": {
+            "p": "C-03-31",
+            "serial": "350",
+            "start": 4905,
+            "end": 4941,
+            "qualification": "専任資格"
+          },
+          "subject": "C-03-31",
+          "object": null,
+          "observer": "A-01-51",
+          "source_kind": "document",
+          "modality": "observed",
+          "polarity": "affirmative",
+          "qualifiers": {
+            "no_duplicate": true,
+            "no_transfer": true,
+            "qualified": true
+          },
+          "time": null,
+          "interval": [
+            4905,
+            4941
+          ],
+          "value": "350",
+          "unit": null,
+          "required_precision": "minute",
+          "epistemic_scope": "指定された情報源が示す範囲。発言は事実へ昇格しない。他人の内面を創作しない。",
+          "critical_fields": [
+            "p",
+            "serial",
+            "start",
+            "end",
+            "qualification",
+            "source_kind",
+            "modality",
+            "polarity",
+            "no_duplicate",
+            "no_transfer",
+            "qualified"
+          ]
+        }
+      ],
+      "extraction": {
+        "observations": [
+          {
+            "type": "KEY",
+            "fields": [
+              {
+                "key": "p",
+                "value": "<P1>"
+              },
+              {
+                "key": "serial",
+                "value": "305"
+              },
+              {
+                "key": "start",
+                "value": "D04 09:45"
+              },
+              {
+                "key": "end",
+                "value": "D04 10:21"
+              },
+              {
+                "key": "qualification",
+                "value": "専任資格"
+              }
+            ],
+            "qualifiers": [
+              {
+                "key": "no_duplicate",
+                "value": true
+              },
+              {
+                "key": "no_transfer",
+                "value": true
+              },
+              {
+                "key": "qualified",
+                "value": true
+              }
+            ],
+            "source_kind": "document",
+            "modality": "observed",
+            "polarity": "affirmative",
+            "quote": "<P1>が専任資格を照合して、番号305の青い印の操作鍵を受け取った。鍵は複製がなく、D04 09:45からD04 10:21まで他人へ渡されていない。"
+          }
+        ],
+        "additions": []
+      },
+      "audit": {
+        "grounding": [
+          {
+            "index": 0,
+            "supported": true,
+            "quote": "<P1>が専任資格を照合して、番号305の青い印の操作鍵を受け取った。鍵は複製がなく、D04 09:45からD04 10:21まで他人へ渡されていない。"
+          }
+        ],
+        "equivalences": [],
+        "additions": [],
+        "quality": [],
+        "uncertain": false
+      },
+      "expectedDecision": false,
+      "result": {
+        "pass": false,
+        "issues": [
+          {
+            "code": "changed_value",
+            "field": "serial",
+            "expected": "350",
+            "actual": 305,
+            "quote": "{P:C-03-31}が専任資格を照合して、番号305の青い印の操作鍵を受け取った。鍵は複製がなく、D04 09:45からD04 10:21まで他人へ渡されていない。"
+          }
+        ],
+        "observations": [
+          {
+            "type": "KEY",
+            "args": {
+              "p": "C-03-31",
+              "serial": 305,
+              "start": 4905,
+              "end": 4941,
+              "qualification": "専任資格"
+            },
+            "quote": "{P:C-03-31}が専任資格を照合して、番号305の青い印の操作鍵を受け取った。鍵は複製がなく、D04 09:45からD04 10:21まで他人へ渡されていない。",
+            "source_kind": "document",
+            "modality": "observed",
+            "polarity": "affirmative"
+          }
+        ],
+        "quality": []
+      }
+    }
+  ]
+}

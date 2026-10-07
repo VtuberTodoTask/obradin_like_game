@@ -1,0 +1,3134 @@
+{
+  "model": "gpt-6-luna",
+  "entries": 2,
+  "llm": 2,
+  "cached": 0,
+  "unresolved": [],
+  "specErrors": [],
+  "contradictions": 0,
+  "overlap": null,
+  "stats": {
+    "calls": 6,
+    "retries": 0,
+    "inflight": 0,
+    "promptTokens": 14630,
+    "completionTokens": 3502,
+    "lastIssue": "",
+    "phases": {
+      "generation": 2,
+      "extraction": 2,
+      "audit": 2
+    }
+  },
+  "diagnostics": [
+    {
+      "seed": 730,
+      "generatorVersion": "2.1",
+      "evidenceVersion": "semantic-3",
+      "promptVersion": "whole-log-3",
+      "model": "gpt-6-luna",
+      "verifyModel": "gpt-6-luna",
+      "sceneId": "s27",
+      "entryId": "A-04-23#4",
+      "referenceMapping": {
+        "{P:A-04-23}": "<P1>",
+        "{P:C-03-31}": "<P2>"
+      },
+      "stages": [
+        "内部ID→別名→参照検査→内部IDへ復元→意味抽出の照合"
+      ],
+      "contextHash": "6c2d7201",
+      "template": "時刻D04 10:00、隔離盤白の自動履歴に操作鍵707で遮断を解除し通電した記録がある。電気の専任資格の照合は成功し、別の操作は記録されていない。",
+      "required": [
+        {
+          "evidence_id": "e27",
+          "predicate": "SWITCH",
+          "args": {
+            "t": 4920,
+            "device": "隔離盤白",
+            "serial": "707",
+            "operation": "遮断を解除し通電",
+            "qualification": "電気の専任資格"
+          },
+          "subject": null,
+          "object": null,
+          "observer": "A-04-23",
+          "source_kind": "machine",
+          "modality": "observed",
+          "polarity": "affirmative",
+          "qualifiers": {
+            "qualified": true,
+            "no_other_operation": true
+          },
+          "time": 4920,
+          "interval": null,
+          "value": "707",
+          "unit": null,
+          "required_precision": "minute",
+          "epistemic_scope": "指定された情報源が示す範囲。発言は事実へ昇格しない。他人の内面を創作しない。",
+          "critical_fields": [
+            "t",
+            "device",
+            "serial",
+            "operation",
+            "qualification",
+            "source_kind",
+            "modality",
+            "polarity",
+            "qualified",
+            "no_other_operation"
+          ]
+        }
+      ],
+      "attempts": [
+        {
+          "round": 0,
+          "generationInput": {
+            "time": "D04 10:03",
+            "role": "設備操作の観察",
+            "persona": {
+              "pronoun": "私",
+              "personality": "信心深い",
+              "goal": "仲間を救う"
+            },
+            "rules": "支給上着の縫い印は、区画・職能分類・入居の帯のいずれか一つの系統で配られる。同じ系統には同じ印、異なる系統には違う印を渡す。入居の帯は01〜03番と04番以降。入居台帳は受付順の連続した記録で、欠番や抹消はない。当番表の担当欄には登録資格を持つ者だけを載せ、手伝いは補助欄へ記す。入居受付票の番号はその台帳の入居順を表す。線量計はmSvで積算し、このシェルターの医療票では900mSv以上を致死域の被曝と判定する。架空病Kの試薬は判定コード1を感染陽性とする。",
+            "previous": [
+              "<P1>は<P2>を「先生」と呼んでいた。以前に回路の測定を教わったという。",
+              "時刻D02 13:35、<P1>は亀裂のある遮蔽壁で線量計を持って救助に入った。これが最初の接触で、その前には接触していない。\n時刻D02 14:05、<P1>の積算線量計の測定票を読んだ。値は900mSv、判定欄は「致死域の被曝を示す」。票の人物と測定した身体を照合した。"
+            ],
+            "required": [
+              {
+                "evidence_id": "e27",
+                "predicate": "SWITCH",
+                "args": {
+                  "t": "D04 10:00",
+                  "device": "隔離盤白",
+                  "serial": "707",
+                  "operation": "遮断を解除し通電",
+                  "qualification": "電気の専任資格"
+                },
+                "subject": null,
+                "object": null,
+                "observer": "<P1>",
+                "source_kind": "machine",
+                "modality": "observed",
+                "polarity": "affirmative",
+                "qualifiers": {
+                  "qualified": true,
+                  "no_other_operation": true
+                },
+                "time": "D04 10:00",
+                "interval": null,
+                "value": "707",
+                "unit": null,
+                "required_precision": "minute",
+                "epistemic_scope": "指定された情報源が示す範囲。発言は事実へ昇格しない。他人の内面を創作しない。",
+                "critical_fields": [
+                  "t",
+                  "device",
+                  "serial",
+                  "operation",
+                  "qualification",
+                  "source_kind",
+                  "modality",
+                  "polarity",
+                  "qualified",
+                  "no_other_operation"
+                ]
+              }
+            ],
+            "scene_records": [],
+            "scope": "示された観察・文書・会話のみ。他人の内面、未提示の道具・出来事・特徴を足さない。",
+            "narrator_ref": "<P1>",
+            "entry_id": "log-1",
+            "semantics": "narrator_refが書き手。別の<Pn>を自分にしない。一人称の主語を明示できる。時刻のt/start/endは実際の観察・操作の日時で、本文に意味を残す（LAST_SENSEの現在時刻はヘッダーが保証）。全qualifiersも意味を維持する。NEXTはpがqの直後、PREVIOUSはpがqの直前。WORKは当番登録と実際の作業。ACKは断線・感電警告を読み署名・復唱した上で解除を選んだ記憶。PLANは実際に選んだ決意で、単なる仮定ではない。受領や所在の肯定と、貸与等の否定を混同しない。"
+          },
+          "output": {
+            "entry_id": "log-1",
+            "text": "私は端末の自動履歴で、D04 10:00に隔離盤白のシリアル707が遮断を解除して通電したことを確かめた。これは電気の専任資格を持つ者による操作で、ほかの操作はなかった。仲間を救うため、どうか守りをお与えください。"
+          },
+          "extractionInput": {
+            "text": "私は端末の自動履歴で、D04 10:00に隔離盤白のシリアル707が遮断を解除して通電したことを確かめた。これは電気の専任資格を持つ者による操作で、ほかの操作はなかった。仲間を救うため、どうか守りをお与えください。",
+            "references": [
+              "<P1>",
+              "<P2>"
+            ],
+            "time": "D04 10:03",
+            "observer": "<P1>",
+            "public_rules": "支給上着の縫い印は、区画・職能分類・入居の帯のいずれか一つの系統で配られる。同じ系統には同じ印、異なる系統には違う印を渡す。入居の帯は01〜03番と04番以降。入居台帳は受付順の連続した記録で、欠番や抹消はない。当番表の担当欄には登録資格を持つ者だけを載せ、手伝いは補助欄へ記す。入居受付票の番号はその台帳の入居順を表す。線量計はmSvで積算し、このシェルターの医療票では900mSv以上を致死域の被曝と判定する。架空病Kの試薬は判定コード1を感染陽性とする。",
+            "vocabulary": [
+              {
+                "type": "MARKER",
+                "description": "[p]の支給上着の縫い印は[mark]だった。",
+                "fields": [
+                  "p",
+                  "mark"
+                ],
+                "qualifiers": [],
+                "default_source": "direct"
+              },
+              {
+                "type": "HOME",
+                "description": "[p]は[district]区画の寝室を開け、「ここが自分の部屋だ」と言った。",
+                "fields": [
+                  "p",
+                  "district"
+                ],
+                "qualifiers": [],
+                "default_source": "direct"
+              },
+              {
+                "type": "WORK",
+                "description": "当番表の担当欄は[p]。持ち場で[task]をしているところを見た。",
+                "fields": [
+                  "p",
+                  "task"
+                ],
+                "qualifiers": [
+                  "registered_duty",
+                  "work_seen"
+                ],
+                "default_source": "document"
+              },
+              {
+                "type": "NEXT",
+                "description": "入居台帳を開くと、[q]、[p]の順で受付の行が続いていた。",
+                "fields": [
+                  "q",
+                  "p"
+                ],
+                "qualifiers": [],
+                "default_source": "document"
+              },
+              {
+                "type": "PREVIOUS",
+                "description": "入居台帳では、[q]の一つ前の受付行に[p]が載っていた。",
+                "fields": [
+                  "q",
+                  "p"
+                ],
+                "qualifiers": [],
+                "default_source": "document"
+              },
+              {
+                "type": "NUMBER",
+                "description": "入居受付票を確かめた。[p]の入居順の欄は[n]番だった。",
+                "fields": [
+                  "p",
+                  "n"
+                ],
+                "qualifiers": [],
+                "default_source": "document"
+              },
+              {
+                "type": "BEFORE",
+                "description": "[p]は[q]より後に入居した。入居順に並ぶ列では、[q]が前で[p]が後だった。",
+                "fields": [
+                  "p",
+                  "q"
+                ],
+                "qualifiers": [],
+                "default_source": "direct"
+              },
+              {
+                "type": "LAST",
+                "description": "[p]が最後の入居者だった。その後は誰も入居していない。",
+                "fields": [
+                  "p"
+                ],
+                "qualifiers": [],
+                "default_source": "document"
+              },
+              {
+                "type": "MENTOR",
+                "description": "[p]は[q]を「先生」と呼んでいた。以前に[lesson]を教わったという。",
+                "fields": [
+                  "p",
+                  "q",
+                  "lesson"
+                ],
+                "qualifiers": [],
+                "default_source": "speech"
+              },
+              {
+                "type": "WORDS",
+                "description": "[p]は「[quote]」と言った。私には[scope]しか分からなかった。",
+                "fields": [
+                  "p",
+                  "quote",
+                  "scope"
+                ],
+                "qualifiers": [],
+                "default_source": "speech"
+              },
+              {
+                "type": "FAULT",
+                "description": "D[day]の点検票を読んだ。[device]の[defect]は未修理で、[hazard]と明記されていた。",
+                "fields": [
+                  "day",
+                  "device",
+                  "defect",
+                  "hazard"
+                ],
+                "qualifiers": [],
+                "default_source": "document"
+              },
+              {
+                "type": "ACK",
+                "description": "時刻[t]、[p]が[device]の断線と感電の警告を読んだ。本人が署名し、警告を復唱してから遮断の解除を選んだ。",
+                "fields": [
+                  "t",
+                  "p",
+                  "device"
+                ],
+                "qualifiers": [
+                  "read_warning",
+                  "signed_warning",
+                  "repeated_warning",
+                  "chose_override"
+                ],
+                "default_source": "memory"
+              },
+              {
+                "type": "LAST_SENSE",
+                "description": "時刻[t]、[p]の最後の記憶は[feeling]。",
+                "fields": [
+                  "t",
+                  "p",
+                  "feeling"
+                ],
+                "qualifiers": [],
+                "default_source": "memory"
+              },
+              {
+                "type": "PULSE_END",
+                "description": "時刻[t]、医療端末が[p]の身体の脈拍信号停止を記録した。",
+                "fields": [
+                  "t",
+                  "p"
+                ],
+                "qualifiers": [],
+                "default_source": "machine"
+              },
+              {
+                "type": "KEY",
+                "description": "[p]が[qualification]を照合して、番号[serial]の青い印の操作鍵を受け取った。鍵は複製がなく、[start]から[end]まで他人へ渡されていない。",
+                "fields": [
+                  "p",
+                  "qualification",
+                  "serial",
+                  "start",
+                  "end"
+                ],
+                "qualifiers": [
+                  "no_duplicate",
+                  "no_transfer",
+                  "qualified"
+                ],
+                "default_source": "document"
+              },
+              {
+                "type": "SWITCH",
+                "description": "時刻[t]、[device]の自動履歴に操作鍵[serial]で[operation]した記録がある。[qualification]の照合は成功し、別の操作は記録されていない。",
+                "fields": [
+                  "t",
+                  "device",
+                  "serial",
+                  "operation",
+                  "qualification"
+                ],
+                "qualifiers": [
+                  "qualified",
+                  "no_other_operation"
+                ],
+                "default_source": "machine"
+              },
+              {
+                "type": "SHOCK",
+                "description": "時刻[t]、[v]が[device]に触れ、指先が焦げて全身が跳ねた。直後に脈と呼吸が止まり、蘇生しても戻らなかった。",
+                "fields": [
+                  "t",
+                  "v",
+                  "device"
+                ],
+                "qualifiers": [
+                  "pulse_stopped",
+                  "no_recovery"
+                ],
+                "default_source": "direct"
+              },
+              {
+                "type": "GEAR",
+                "description": "[p]が番号[serial]の作業手袋を受領した。片方の青い縫い目も照合した。[start]から[end]まで貸し出しも交換もなかった。",
+                "fields": [
+                  "p",
+                  "serial",
+                  "start",
+                  "end"
+                ],
+                "qualifiers": [
+                  "no_exchange",
+                  "no_transfer"
+                ],
+                "default_source": "direct"
+              },
+              {
+                "type": "PUSH",
+                "description": "時刻[t]、番号[serial]の青い縫い目の手袋をした両腕が[v]の背を強く押した。私は[scope]を見た。直前にその腕の主が[qualification]を照合した。手すりも足場も壊れていなかった。",
+                "fields": [
+                  "t",
+                  "serial",
+                  "v",
+                  "scope",
+                  "qualification"
+                ],
+                "qualifiers": [
+                  "qualified",
+                  "intact_platform"
+                ],
+                "default_source": "direct"
+              },
+              {
+                "type": "FALL",
+                "description": "時刻[t]、[v]が縦坑へ落ちた。底で脈と呼吸が止まったことを確認した。足場が抜けた跡はなかった。",
+                "fields": [
+                  "t",
+                  "v"
+                ],
+                "qualifiers": [
+                  "pulse_stopped",
+                  "intact_platform"
+                ],
+                "default_source": "direct"
+              },
+              {
+                "type": "KIT",
+                "description": "[p]は番号[serial]の青い印の注射器を持って処置室へ入った。[start]から[end]まで人に渡さず、私の目の前で手に持ち続けていた。",
+                "fields": [
+                  "p",
+                  "serial",
+                  "start",
+                  "end"
+                ],
+                "qualifiers": [
+                  "no_transfer",
+                  "continuous_sight"
+                ],
+                "default_source": "direct"
+              },
+              {
+                "type": "INJECT",
+                "description": "時刻[t]、番号[serial]の注射器から薬剤[drug]が[amount]単位、[v]の静脈に入るのを見た。投与する腕の主は[qualification]を照合していた。目盛りと腕の接続を近くで確かめた。",
+                "fields": [
+                  "t",
+                  "serial",
+                  "drug",
+                  "amount",
+                  "v",
+                  "qualification"
+                ],
+                "qualifiers": [
+                  "qualified",
+                  "intravenous"
+                ],
+                "default_source": "direct"
+              },
+              {
+                "type": "LIMIT",
+                "description": "薬剤[drug]の封入説明には、静脈投与の上限が[limit]単位で、その十倍以上では一分以内に呼吸停止するとある。",
+                "fields": [
+                  "drug",
+                  "limit"
+                ],
+                "qualifiers": [],
+                "default_source": "document"
+              },
+              {
+                "type": "DOSE_SETTING",
+                "description": "時刻[t]、[p]は薬剤[drug]の上限[limit]単位を読み上げた。それから警告を解除し、投与量を[amount]単位へ手動で増やした。数字の取り違えではなく、警告を読んで選んだ操作だった。",
+                "fields": [
+                  "t",
+                  "p",
+                  "drug",
+                  "limit",
+                  "amount"
+                ],
+                "qualifiers": [
+                  "understood_warning",
+                  "manual_override"
+                ],
+                "default_source": "memory"
+              },
+              {
+                "type": "STOP",
+                "description": "時刻[t]、[v]は処置台で呼吸と脈が止まった。蘇生しても戻らず、その身体の死亡を確認した。",
+                "fields": [
+                  "t",
+                  "v"
+                ],
+                "qualifiers": [
+                  "pulse_stopped",
+                  "no_recovery"
+                ],
+                "default_source": "direct"
+              },
+              {
+                "type": "ALIBI",
+                "description": "[p]は[start]から[end]まで[place]の途切れない映像に映っていた。その間に外へ出ていない。",
+                "fields": [
+                  "p",
+                  "start",
+                  "end",
+                  "place"
+                ],
+                "qualifiers": [
+                  "continuous_video",
+                  "no_exit"
+                ],
+                "default_source": "machine"
+              },
+              {
+                "type": "CLAIM",
+                "description": "[p]は「[q]の仕業に間違いない」と言った。ただし[scope]で、手元や顔を確認した話ではなかった。",
+                "fields": [
+                  "p",
+                  "q",
+                  "scope"
+                ],
+                "qualifiers": [],
+                "default_source": "speech"
+              },
+              {
+                "type": "TESTIMONY",
+                "description": "[p]は「[quote]。確信はない」と話した。[scope]ので、後で記録と照合するつもりだ。",
+                "fields": [
+                  "p",
+                  "quote",
+                  "scope"
+                ],
+                "qualifiers": [],
+                "default_source": "speech"
+              },
+              {
+                "type": "OFFICIAL",
+                "description": "[p]は管理AIに、[v]の死を[label]として登録した。診察や現場確認はせず、本人の申告だけによる登録だった。",
+                "fields": [
+                  "p",
+                  "v",
+                  "label"
+                ],
+                "qualifiers": [],
+                "default_source": "speech"
+              },
+              {
+                "type": "REVISION",
+                "description": "[owner]の[t]の記録は版[old]から版[new]へ変更されている。変更内容の本文は残っていない。監査用の時刻だけが保存されている。",
+                "fields": [
+                  "owner",
+                  "t",
+                  "old",
+                  "new"
+                ],
+                "qualifiers": [],
+                "default_source": "machine"
+              },
+              {
+                "type": "EXPOSE",
+                "description": "時刻[t]、[p]は[source]で[route]。これが最初の接触で、その前には接触していない。",
+                "fields": [
+                  "t",
+                  "p",
+                  "source",
+                  "route"
+                ],
+                "qualifiers": [
+                  "first_contact"
+                ],
+                "default_source": "direct"
+              },
+              {
+                "type": "TEST",
+                "description": "時刻[t]、[p]の[method]の測定票を読んだ。値は[value][unit]、判定欄は「[meaning]」。票の人物と測定した身体を照合した。",
+                "fields": [
+                  "t",
+                  "p",
+                  "method",
+                  "value",
+                  "unit",
+                  "meaning"
+                ],
+                "qualifiers": [],
+                "default_source": "document"
+              },
+              {
+                "type": "RATIONS",
+                "description": "時刻[t]から[p]への食事の配達が止まった。倉庫の備蓄は別に残っていたが、その人の受領欄はずっと空白だった。",
+                "fields": [
+                  "t",
+                  "p"
+                ],
+                "qualifiers": [],
+                "default_source": "document"
+              },
+              {
+                "type": "STARVE",
+                "description": "時刻[t]、[p]は食事を受け取れないまま[days]日が経ち、ひどくやせて動けなくなった。脈と呼吸が止まり、蘇生しても戻らなかった。",
+                "fields": [
+                  "t",
+                  "p",
+                  "days"
+                ],
+                "qualifiers": [
+                  "pulse_stopped",
+                  "no_recovery"
+                ],
+                "default_source": "direct"
+              },
+              {
+                "type": "TERMINAL",
+                "description": "時刻[t]、[p]の[sign]が続き、脈と呼吸が止まった。処置を続けても戻らず、死亡を確認した。",
+                "fields": [
+                  "t",
+                  "p",
+                  "sign"
+                ],
+                "qualifiers": [
+                  "pulse_stopped",
+                  "no_recovery"
+                ],
+                "default_source": "direct"
+              },
+              {
+                "type": "COLLAPSE",
+                "description": "時刻[t]、[p]が救助に入った通路で、腐食した同じ梁が一度に崩れた。瓦礫の下から身体を出したが、脈と呼吸が戻らなかった。",
+                "fields": [
+                  "t",
+                  "p"
+                ],
+                "qualifiers": [
+                  "pulse_stopped",
+                  "single_collapse"
+                ],
+                "default_source": "direct"
+              },
+              {
+                "type": "BODY_SENSOR",
+                "description": "時刻[t]、壁面の医療端末で[p]の身体の脈と呼吸が止まった。固定カメラでも同じ身体を確認し、その後も動かず回復していない。チップの通信切断だけによる判定ではない。",
+                "fields": [
+                  "t",
+                  "p"
+                ],
+                "qualifiers": [
+                  "pulse_stopped",
+                  "fixed_camera"
+                ],
+                "default_source": "machine"
+              },
+              {
+                "type": "SUPPLIES",
+                "description": "時刻[t]、残る食料は[state]。倉庫内を数えて確認した。各人への配達量とは別の集計だ。",
+                "fields": [
+                  "t",
+                  "state"
+                ],
+                "qualifiers": [],
+                "default_source": "direct"
+              },
+              {
+                "type": "LIVE",
+                "description": "時刻[t]、[p]の当日の映像と身体計測を確認した。身体は温かく、呼吸と脈がある。[place]で動いている。",
+                "fields": [
+                  "t",
+                  "p",
+                  "place"
+                ],
+                "qualifiers": [
+                  "pulse",
+                  "breathing"
+                ],
+                "default_source": "machine"
+              },
+              {
+                "type": "FEATURE",
+                "description": "[p]の右手には[feature]がある。全員の手を検めたが、この特徴を持つのは一人だけだった。",
+                "fields": [
+                  "p",
+                  "feature"
+                ],
+                "qualifiers": [
+                  "unique_among_residents"
+                ],
+                "default_source": "direct"
+              },
+              {
+                "type": "CHIP",
+                "description": "[owner]の身体から摘出されたチップの製造番号は[serial]だった。[t]にその同じ番号が別の身体で再接続された。元の身体は動いていない。",
+                "fields": [
+                  "owner",
+                  "serial",
+                  "t"
+                ],
+                "qualifiers": [],
+                "default_source": "machine"
+              },
+              {
+                "type": "CARRIER",
+                "description": "時刻[t]、製造番号[serial]のチップから届く映像の右手には[feature]がある。脈と呼吸があり、その身体は[place]で動いている。",
+                "fields": [
+                  "t",
+                  "serial",
+                  "feature",
+                  "place"
+                ],
+                "qualifiers": [
+                  "pulse",
+                  "breathing"
+                ],
+                "default_source": "machine"
+              },
+              {
+                "type": "RAID",
+                "description": "時刻[t]、[v]がチップ認証を持たない外来者の刃物で刺された。直後に脈と呼吸が止まり戻らなかった。外来者は外套のまま[place]へ向かった。",
+                "fields": [
+                  "t",
+                  "v",
+                  "place"
+                ],
+                "qualifiers": [
+                  "unauthenticated_attacker",
+                  "pulse_stopped"
+                ],
+                "default_source": "direct"
+              },
+              {
+                "type": "HATCH",
+                "description": "時刻[t]、外部ハッチが[side]から認証なしで開いた。この通路以外に出入口はなく、認証なしの開放一回につき一人だけ通過した。",
+                "fields": [
+                  "t",
+                  "side"
+                ],
+                "qualifiers": [
+                  "unauthenticated",
+                  "only_entrance",
+                  "one_person"
+                ],
+                "default_source": "direct"
+              },
+              {
+                "type": "PLAN",
+                "description": "[p]の記録に「[goal]ために[choice]を選んだ」とあった。",
+                "fields": [
+                  "p",
+                  "goal",
+                  "choice"
+                ],
+                "qualifiers": [],
+                "default_source": "memory"
+              }
+            ],
+            "conventions": "observerは書き手自身の参照。一人称（私、俺、僕等）はobserverへ対応させる。source_kindは知った経路。modalityのobservedは直接観察・本人の記憶・実際に閲覧した文書/機械記録の内容を記すこと。reportedは他者の発言を引用した場合、inferredは推測。過去形や「書類に記された」だけをreportedにしない。polarityは出来事自体の肯否。鍵を受領したならaffirmative、受領していないならnegative。複製や貸与なしは個別qualifiersで保持する。文型は語彙説明でありコピー不要。NEXTはpがqの直後、PREVIOUSはpがqの直前、BEFOREはpがqより後（隣接不要）。WORKは当番登録と実際の作業の両方。ACKは警告の読解・署名・復唱・解除の選択で、単なる応答ではない。LAST_SENSEは意識を失う前の本人の最後の感覚。",
+            "note": "期待する証拠一覧は与えていない。本文に明示されたものだけ抽出する。fieldは語彙のfieldsにあるものだけ。valuesは文型の意味へ正規化し、引用は本文をそのままコピー。LAST_SENSEの本人と現在時刻だけはobserver/timeというプログラムのヘッダーで確定する。他の過去の操作時刻・区間は本文に必要。足りない情報を補完せず、そのfieldは省く。"
+          },
+          "extraction": {
+            "observations": [
+              {
+                "type": "SWITCH",
+                "fields": [
+                  {
+                    "key": "t",
+                    "value": "D04 10:00"
+                  },
+                  {
+                    "key": "device",
+                    "value": "隔離盤白"
+                  },
+                  {
+                    "key": "serial",
+                    "value": "707"
+                  },
+                  {
+                    "key": "operation",
+                    "value": "遮断を解除して通電した"
+                  },
+                  {
+                    "key": "qualification",
+                    "value": "電気の専任資格"
+                  }
+                ],
+                "qualifiers": [
+                  {
+                    "key": "qualified",
+                    "value": true
+                  },
+                  {
+                    "key": "no_other_operation",
+                    "value": true
+                  }
+                ],
+                "source_kind": "machine",
+                "modality": "observed",
+                "polarity": "affirmative",
+                "quote": "私は端末の自動履歴で、D04 10:00に隔離盤白のシリアル707が遮断を解除して通電したことを確かめた。これは電気の専任資格を持つ者による操作で、ほかの操作はなかった。"
+              }
+            ],
+            "additions": [
+              {
+                "kind": "祈願・目的の表現",
+                "quote": "仲間を救うため、どうか守りをお与えください。",
+                "reason": "仲間を救う意図を示す祈願であり、救助の実行や他の事件事実を示す証拠ではない。"
+              }
+            ]
+          },
+          "auditInput": {
+            "text": "私は端末の自動履歴で、D04 10:00に隔離盤白のシリアル707が遮断を解除して通電したことを確かめた。これは電気の専任資格を持つ者による操作で、ほかの操作はなかった。仲間を救うため、どうか守りをお与えください。",
+            "extraction": {
+              "observations": [
+                {
+                  "type": "SWITCH",
+                  "fields": [
+                    {
+                      "key": "t",
+                      "value": "D04 10:00"
+                    },
+                    {
+                      "key": "device",
+                      "value": "隔離盤白"
+                    },
+                    {
+                      "key": "serial",
+                      "value": "707"
+                    },
+                    {
+                      "key": "operation",
+                      "value": "遮断を解除して通電した"
+                    },
+                    {
+                      "key": "qualification",
+                      "value": "電気の専任資格"
+                    }
+                  ],
+                  "qualifiers": [
+                    {
+                      "key": "qualified",
+                      "value": true
+                    },
+                    {
+                      "key": "no_other_operation",
+                      "value": true
+                    }
+                  ],
+                  "source_kind": "machine",
+                  "modality": "observed",
+                  "polarity": "affirmative",
+                  "quote": "私は端末の自動履歴で、D04 10:00に隔離盤白のシリアル707が遮断を解除して通電したことを確かめた。これは電気の専任資格を持つ者による操作で、ほかの操作はなかった。"
+                }
+              ],
+              "additions": [
+                {
+                  "kind": "祈願・目的の表現",
+                  "quote": "仲間を救うため、どうか守りをお与えください。",
+                  "reason": "仲間を救う意図を示す祈願であり、救助の実行や他の事件事実を示す証拠ではない。"
+                }
+              ]
+            },
+            "required": [
+              {
+                "evidence_id": "e27",
+                "predicate": "SWITCH",
+                "args": {
+                  "t": "D04 10:00",
+                  "device": "隔離盤白",
+                  "serial": "707",
+                  "operation": "遮断を解除し通電",
+                  "qualification": "電気の専任資格"
+                },
+                "subject": null,
+                "object": null,
+                "observer": "<P1>",
+                "source_kind": "machine",
+                "modality": "observed",
+                "polarity": "affirmative",
+                "qualifiers": {
+                  "qualified": true,
+                  "no_other_operation": true
+                },
+                "time": "D04 10:00",
+                "interval": null,
+                "value": "707",
+                "unit": null,
+                "required_precision": "minute",
+                "epistemic_scope": "指定された情報源が示す範囲。発言は事実へ昇格しない。他人の内面を創作しない。",
+                "critical_fields": [
+                  "t",
+                  "device",
+                  "serial",
+                  "operation",
+                  "qualification",
+                  "source_kind",
+                  "modality",
+                  "polarity",
+                  "qualified",
+                  "no_other_operation"
+                ]
+              }
+            ],
+            "allowed_context": {
+              "persona": {
+                "pronoun": "私",
+                "personality": "信心深い",
+                "goal": "仲間を救う"
+              },
+              "public_rules": "支給上着の縫い印は、区画・職能分類・入居の帯のいずれか一つの系統で配られる。同じ系統には同じ印、異なる系統には違う印を渡す。入居の帯は01〜03番と04番以降。入居台帳は受付順の連続した記録で、欠番や抹消はない。当番表の担当欄には登録資格を持つ者だけを載せ、手伝いは補助欄へ記す。入居受付票の番号はその台帳の入居順を表す。線量計はmSvで積算し、このシェルターの医療票では900mSv以上を致死域の被曝と判定する。架空病Kの試薬は判定コード1を感染陽性とする。",
+              "scope": "示された観察・文書・会話のみ。他人の内面、未提示の道具・出来事・特徴を足さない。",
+              "observer": "<P1>",
+              "time": "D04 10:03",
+              "conventions": "observerは書き手自身の参照。一人称（私、俺、僕等）はobserverへ対応させる。source_kindは知った経路。modalityのobservedは直接観察・本人の記憶・実際に閲覧した文書/機械記録の内容を記すこと。reportedは他者の発言を引用した場合、inferredは推測。過去形や「書類に記された」だけをreportedにしない。polarityは出来事自体の肯否。鍵を受領したならaffirmative、受領していないならnegative。複製や貸与なしは個別qualifiersで保持する。文型は語彙説明でありコピー不要。NEXTはpがqの直後、PREVIOUSはpがqの直前、BEFOREはpがqより後（隣接不要）。WORKは当番登録と実際の作業の両方。ACKは警告の読解・署名・復唱・解除の選択で、単なる応答ではない。LAST_SENSEは意識を失う前の本人の最後の感覚。",
+              "header_scope": "LAST_SENSEの本人と現在時刻だけは記録ヘッダーが保証する。それ以外の操作時刻は本文に必要。"
+            }
+          },
+          "audit": {
+            "grounding": [
+              {
+                "index": 0,
+                "supported": true,
+                "quote": "私は端末の自動履歴で、D04 10:00に隔離盤白のシリアル707が遮断を解除して通電したことを確かめた。これは電気の専任資格を持つ者による操作で、ほかの操作はなかった。",
+                "reason": "自動履歴を実際に確認したと述べており、日時・機器・シリアル・操作・資格・情報源・観察としての認識を支えている。後半は資格保有者による操作と、ほかの操作がなかったことも明示している。"
+              }
+            ],
+            "equivalences": [
+              {
+                "index": 0,
+                "field": "t",
+                "expected": "D04 10:00",
+                "actual": "D04 10:00",
+                "equivalent": true,
+                "quote": "D04 10:00"
+              },
+              {
+                "index": 0,
+                "field": "device",
+                "expected": "隔離盤白",
+                "actual": "隔離盤白",
+                "equivalent": true,
+                "quote": "隔離盤白"
+              },
+              {
+                "index": 0,
+                "field": "serial",
+                "expected": "707",
+                "actual": "707",
+                "equivalent": true,
+                "quote": "シリアル707"
+              },
+              {
+                "index": 0,
+                "field": "operation",
+                "expected": "遮断を解除し通電",
+                "actual": "遮断を解除して通電した",
+                "equivalent": true,
+                "quote": "遮断を解除して通電した"
+              },
+              {
+                "index": 0,
+                "field": "qualification",
+                "expected": "電気の専任資格",
+                "actual": "電気の専任資格",
+                "equivalent": true,
+                "quote": "電気の専任資格を持つ者による操作"
+              },
+              {
+                "index": 0,
+                "field": "source_kind",
+                "expected": "machine",
+                "actual": "machine",
+                "equivalent": true,
+                "quote": "端末の自動履歴"
+              },
+              {
+                "index": 0,
+                "field": "modality",
+                "expected": "observed",
+                "actual": "observed",
+                "equivalent": true,
+                "quote": "確かめた"
+              },
+              {
+                "index": 0,
+                "field": "polarity",
+                "expected": "affirmative",
+                "actual": "affirmative",
+                "equivalent": true,
+                "quote": "遮断を解除して通電した"
+              },
+              {
+                "index": 0,
+                "field": "qualified",
+                "expected": "true",
+                "actual": "true",
+                "equivalent": true,
+                "quote": "電気の専任資格を持つ者による操作"
+              },
+              {
+                "index": 0,
+                "field": "no_other_operation",
+                "expected": "true",
+                "actual": "true",
+                "equivalent": true,
+                "quote": "ほかの操作はなかった"
+              }
+            ],
+            "additions": [
+              {
+                "kind": "allowed",
+                "quote": "仲間を救うため、どうか守りをお与えください。",
+                "reason": "許可された「仲間を救う」という目的と信心深い persona に沿った祈願であり、救助の実行や他の事件事実を追加していない。"
+              }
+            ],
+            "quality": [],
+            "uncertain": false
+          },
+          "pass": true,
+          "issues": [],
+          "quality": []
+        }
+      ],
+      "origin": "llm"
+    },
+    {
+      "seed": 730,
+      "generatorVersion": "2.1",
+      "evidenceVersion": "semantic-3",
+      "promptVersion": "whole-log-3",
+      "model": "gpt-6-luna",
+      "verifyModel": "gpt-6-luna",
+      "sceneId": "s25",
+      "entryId": "A-01-51#5",
+      "referenceMapping": {
+        "{P:C-03-31}": "<P1>",
+        "{P:A-01-51}": "<P2>"
+      },
+      "stages": [
+        "内部ID→別名→参照検査→内部IDへ復元→意味抽出の照合"
+      ],
+      "contextHash": "e758c617",
+      "template": "{P:C-03-31}が電気の専任資格を照合して、番号707の青い印の操作鍵を受け取った。鍵は複製がなく、D04 09:45からD04 10:21まで他人へ渡されていない。",
+      "required": [
+        {
+          "evidence_id": "e25",
+          "predicate": "KEY",
+          "args": {
+            "p": "C-03-31",
+            "serial": "707",
+            "start": 4905,
+            "end": 4941,
+            "qualification": "電気の専任資格"
+          },
+          "subject": "C-03-31",
+          "object": null,
+          "observer": "A-01-51",
+          "source_kind": "document",
+          "modality": "observed",
+          "polarity": "affirmative",
+          "qualifiers": {
+            "no_duplicate": true,
+            "no_transfer": true,
+            "qualified": true
+          },
+          "time": null,
+          "interval": [
+            4905,
+            4941
+          ],
+          "value": "707",
+          "unit": null,
+          "required_precision": "minute",
+          "epistemic_scope": "指定された情報源が示す範囲。発言は事実へ昇格しない。他人の内面を創作しない。",
+          "critical_fields": [
+            "p",
+            "serial",
+            "start",
+            "end",
+            "qualification",
+            "source_kind",
+            "modality",
+            "polarity",
+            "no_duplicate",
+            "no_transfer",
+            "qualified"
+          ]
+        }
+      ],
+      "attempts": [
+        {
+          "round": 0,
+          "generationInput": {
+            "time": "D04 10:30",
+            "role": "権限の引き継ぎ",
+            "persona": {
+              "pronoun": "私",
+              "personality": "信心深い",
+              "goal": "仲間を救う"
+            },
+            "rules": "支給上着の縫い印は、区画・職能分類・入居の帯のいずれか一つの系統で配られる。同じ系統には同じ印、異なる系統には違う印を渡す。入居の帯は01〜03番と04番以降。入居台帳は受付順の連続した記録で、欠番や抹消はない。当番表の担当欄には登録資格を持つ者だけを載せ、手伝いは補助欄へ記す。入居受付票の番号はその台帳の入居順を表す。線量計はmSvで積算し、このシェルターの医療票では900mSv以上を致死域の被曝と判定する。架空病Kの試薬は判定コード1を感染陽性とする。",
+            "previous": [
+              "時刻D02 13:20、<P2>は亀裂のある遮蔽壁で線量計を持って救助に入った。これが最初の接触で、その前には接触していない。\n時刻D02 13:50、<P2>の積算線量計の測定票を読んだ。値は900mSv、判定欄は「致死域の被曝を示す」。票の人物と測定した身体を照合した。",
+              "D03の点検票を読んだ。隔離盤白の接地線の断線は未修理で、通電すれば筐体に触れた人が感電すると明記されていた。"
+            ],
+            "required": [
+              {
+                "evidence_id": "e25",
+                "predicate": "KEY",
+                "args": {
+                  "p": "<P1>",
+                  "serial": "707",
+                  "start": "D04 09:45",
+                  "end": "D04 10:21",
+                  "qualification": "電気の専任資格"
+                },
+                "subject": "<P1>",
+                "object": null,
+                "observer": "<P2>",
+                "source_kind": "document",
+                "modality": "observed",
+                "polarity": "affirmative",
+                "qualifiers": {
+                  "no_duplicate": true,
+                  "no_transfer": true,
+                  "qualified": true
+                },
+                "time": null,
+                "interval": [
+                  "D04 09:45",
+                  "D04 10:21"
+                ],
+                "value": "707",
+                "unit": null,
+                "required_precision": "minute",
+                "epistemic_scope": "指定された情報源が示す範囲。発言は事実へ昇格しない。他人の内面を創作しない。",
+                "critical_fields": [
+                  "p",
+                  "serial",
+                  "start",
+                  "end",
+                  "qualification",
+                  "source_kind",
+                  "modality",
+                  "polarity",
+                  "no_duplicate",
+                  "no_transfer",
+                  "qualified"
+                ]
+              }
+            ],
+            "scene_records": [],
+            "scope": "示された観察・文書・会話のみ。他人の内面、未提示の道具・出来事・特徴を足さない。",
+            "narrator_ref": "<P2>",
+            "entry_id": "log-2",
+            "semantics": "narrator_refが書き手。別の<Pn>を自分にしない。一人称の主語を明示できる。時刻のt/start/endは実際の観察・操作の日時で、本文に意味を残す（LAST_SENSEの現在時刻はヘッダーが保証）。全qualifiersも意味を維持する。NEXTはpがqの直後、PREVIOUSはpがqの直前。WORKは当番登録と実際の作業。ACKは断線・感電警告を読み署名・復唱した上で解除を選んだ記憶。PLANは実際に選んだ決意で、単なる仮定ではない。受領や所在の肯定と、貸与等の否定を混同しない。"
+          },
+          "output": {
+            "entry_id": "log-2",
+            "text": "閲覧した書類には、鍵707はD04 09:45から10:21まで<P1>に渡され、重複も譲渡もなかったとある。電気の専任資格も照合済みで、条件を満たしていた。仲間を守るための引き継ぎが、どうか正しいものでありますように。"
+          },
+          "extractionInput": {
+            "text": "閲覧した書類には、鍵707はD04 09:45から10:21まで<P1>に渡され、重複も譲渡もなかったとある。電気の専任資格も照合済みで、条件を満たしていた。仲間を守るための引き継ぎが、どうか正しいものでありますように。",
+            "references": [
+              "<P1>",
+              "<P2>"
+            ],
+            "time": "D04 10:30",
+            "observer": "<P2>",
+            "public_rules": "支給上着の縫い印は、区画・職能分類・入居の帯のいずれか一つの系統で配られる。同じ系統には同じ印、異なる系統には違う印を渡す。入居の帯は01〜03番と04番以降。入居台帳は受付順の連続した記録で、欠番や抹消はない。当番表の担当欄には登録資格を持つ者だけを載せ、手伝いは補助欄へ記す。入居受付票の番号はその台帳の入居順を表す。線量計はmSvで積算し、このシェルターの医療票では900mSv以上を致死域の被曝と判定する。架空病Kの試薬は判定コード1を感染陽性とする。",
+            "vocabulary": [
+              {
+                "type": "MARKER",
+                "description": "[p]の支給上着の縫い印は[mark]だった。",
+                "fields": [
+                  "p",
+                  "mark"
+                ],
+                "qualifiers": [],
+                "default_source": "direct"
+              },
+              {
+                "type": "HOME",
+                "description": "[p]は[district]区画の寝室を開け、「ここが自分の部屋だ」と言った。",
+                "fields": [
+                  "p",
+                  "district"
+                ],
+                "qualifiers": [],
+                "default_source": "direct"
+              },
+              {
+                "type": "WORK",
+                "description": "当番表の担当欄は[p]。持ち場で[task]をしているところを見た。",
+                "fields": [
+                  "p",
+                  "task"
+                ],
+                "qualifiers": [
+                  "registered_duty",
+                  "work_seen"
+                ],
+                "default_source": "document"
+              },
+              {
+                "type": "NEXT",
+                "description": "入居台帳を開くと、[q]、[p]の順で受付の行が続いていた。",
+                "fields": [
+                  "q",
+                  "p"
+                ],
+                "qualifiers": [],
+                "default_source": "document"
+              },
+              {
+                "type": "PREVIOUS",
+                "description": "入居台帳では、[q]の一つ前の受付行に[p]が載っていた。",
+                "fields": [
+                  "q",
+                  "p"
+                ],
+                "qualifiers": [],
+                "default_source": "document"
+              },
+              {
+                "type": "NUMBER",
+                "description": "入居受付票を確かめた。[p]の入居順の欄は[n]番だった。",
+                "fields": [
+                  "p",
+                  "n"
+                ],
+                "qualifiers": [],
+                "default_source": "document"
+              },
+              {
+                "type": "BEFORE",
+                "description": "[p]は[q]より後に入居した。入居順に並ぶ列では、[q]が前で[p]が後だった。",
+                "fields": [
+                  "p",
+                  "q"
+                ],
+                "qualifiers": [],
+                "default_source": "direct"
+              },
+              {
+                "type": "LAST",
+                "description": "[p]が最後の入居者だった。その後は誰も入居していない。",
+                "fields": [
+                  "p"
+                ],
+                "qualifiers": [],
+                "default_source": "document"
+              },
+              {
+                "type": "MENTOR",
+                "description": "[p]は[q]を「先生」と呼んでいた。以前に[lesson]を教わったという。",
+                "fields": [
+                  "p",
+                  "q",
+                  "lesson"
+                ],
+                "qualifiers": [],
+                "default_source": "speech"
+              },
+              {
+                "type": "WORDS",
+                "description": "[p]は「[quote]」と言った。私には[scope]しか分からなかった。",
+                "fields": [
+                  "p",
+                  "quote",
+                  "scope"
+                ],
+                "qualifiers": [],
+                "default_source": "speech"
+              },
+              {
+                "type": "FAULT",
+                "description": "D[day]の点検票を読んだ。[device]の[defect]は未修理で、[hazard]と明記されていた。",
+                "fields": [
+                  "day",
+                  "device",
+                  "defect",
+                  "hazard"
+                ],
+                "qualifiers": [],
+                "default_source": "document"
+              },
+              {
+                "type": "ACK",
+                "description": "時刻[t]、[p]が[device]の断線と感電の警告を読んだ。本人が署名し、警告を復唱してから遮断の解除を選んだ。",
+                "fields": [
+                  "t",
+                  "p",
+                  "device"
+                ],
+                "qualifiers": [
+                  "read_warning",
+                  "signed_warning",
+                  "repeated_warning",
+                  "chose_override"
+                ],
+                "default_source": "memory"
+              },
+              {
+                "type": "LAST_SENSE",
+                "description": "時刻[t]、[p]の最後の記憶は[feeling]。",
+                "fields": [
+                  "t",
+                  "p",
+                  "feeling"
+                ],
+                "qualifiers": [],
+                "default_source": "memory"
+              },
+              {
+                "type": "PULSE_END",
+                "description": "時刻[t]、医療端末が[p]の身体の脈拍信号停止を記録した。",
+                "fields": [
+                  "t",
+                  "p"
+                ],
+                "qualifiers": [],
+                "default_source": "machine"
+              },
+              {
+                "type": "KEY",
+                "description": "[p]が[qualification]を照合して、番号[serial]の青い印の操作鍵を受け取った。鍵は複製がなく、[start]から[end]まで他人へ渡されていない。",
+                "fields": [
+                  "p",
+                  "qualification",
+                  "serial",
+                  "start",
+                  "end"
+                ],
+                "qualifiers": [
+                  "no_duplicate",
+                  "no_transfer",
+                  "qualified"
+                ],
+                "default_source": "document"
+              },
+              {
+                "type": "SWITCH",
+                "description": "時刻[t]、[device]の自動履歴に操作鍵[serial]で[operation]した記録がある。[qualification]の照合は成功し、別の操作は記録されていない。",
+                "fields": [
+                  "t",
+                  "device",
+                  "serial",
+                  "operation",
+                  "qualification"
+                ],
+                "qualifiers": [
+                  "qualified",
+                  "no_other_operation"
+                ],
+                "default_source": "machine"
+              },
+              {
+                "type": "SHOCK",
+                "description": "時刻[t]、[v]が[device]に触れ、指先が焦げて全身が跳ねた。直後に脈と呼吸が止まり、蘇生しても戻らなかった。",
+                "fields": [
+                  "t",
+                  "v",
+                  "device"
+                ],
+                "qualifiers": [
+                  "pulse_stopped",
+                  "no_recovery"
+                ],
+                "default_source": "direct"
+              },
+              {
+                "type": "GEAR",
+                "description": "[p]が番号[serial]の作業手袋を受領した。片方の青い縫い目も照合した。[start]から[end]まで貸し出しも交換もなかった。",
+                "fields": [
+                  "p",
+                  "serial",
+                  "start",
+                  "end"
+                ],
+                "qualifiers": [
+                  "no_exchange",
+                  "no_transfer"
+                ],
+                "default_source": "direct"
+              },
+              {
+                "type": "PUSH",
+                "description": "時刻[t]、番号[serial]の青い縫い目の手袋をした両腕が[v]の背を強く押した。私は[scope]を見た。直前にその腕の主が[qualification]を照合した。手すりも足場も壊れていなかった。",
+                "fields": [
+                  "t",
+                  "serial",
+                  "v",
+                  "scope",
+                  "qualification"
+                ],
+                "qualifiers": [
+                  "qualified",
+                  "intact_platform"
+                ],
+                "default_source": "direct"
+              },
+              {
+                "type": "FALL",
+                "description": "時刻[t]、[v]が縦坑へ落ちた。底で脈と呼吸が止まったことを確認した。足場が抜けた跡はなかった。",
+                "fields": [
+                  "t",
+                  "v"
+                ],
+                "qualifiers": [
+                  "pulse_stopped",
+                  "intact_platform"
+                ],
+                "default_source": "direct"
+              },
+              {
+                "type": "KIT",
+                "description": "[p]は番号[serial]の青い印の注射器を持って処置室へ入った。[start]から[end]まで人に渡さず、私の目の前で手に持ち続けていた。",
+                "fields": [
+                  "p",
+                  "serial",
+                  "start",
+                  "end"
+                ],
+                "qualifiers": [
+                  "no_transfer",
+                  "continuous_sight"
+                ],
+                "default_source": "direct"
+              },
+              {
+                "type": "INJECT",
+                "description": "時刻[t]、番号[serial]の注射器から薬剤[drug]が[amount]単位、[v]の静脈に入るのを見た。投与する腕の主は[qualification]を照合していた。目盛りと腕の接続を近くで確かめた。",
+                "fields": [
+                  "t",
+                  "serial",
+                  "drug",
+                  "amount",
+                  "v",
+                  "qualification"
+                ],
+                "qualifiers": [
+                  "qualified",
+                  "intravenous"
+                ],
+                "default_source": "direct"
+              },
+              {
+                "type": "LIMIT",
+                "description": "薬剤[drug]の封入説明には、静脈投与の上限が[limit]単位で、その十倍以上では一分以内に呼吸停止するとある。",
+                "fields": [
+                  "drug",
+                  "limit"
+                ],
+                "qualifiers": [],
+                "default_source": "document"
+              },
+              {
+                "type": "DOSE_SETTING",
+                "description": "時刻[t]、[p]は薬剤[drug]の上限[limit]単位を読み上げた。それから警告を解除し、投与量を[amount]単位へ手動で増やした。数字の取り違えではなく、警告を読んで選んだ操作だった。",
+                "fields": [
+                  "t",
+                  "p",
+                  "drug",
+                  "limit",
+                  "amount"
+                ],
+                "qualifiers": [
+                  "understood_warning",
+                  "manual_override"
+                ],
+                "default_source": "memory"
+              },
+              {
+                "type": "STOP",
+                "description": "時刻[t]、[v]は処置台で呼吸と脈が止まった。蘇生しても戻らず、その身体の死亡を確認した。",
+                "fields": [
+                  "t",
+                  "v"
+                ],
+                "qualifiers": [
+                  "pulse_stopped",
+                  "no_recovery"
+                ],
+                "default_source": "direct"
+              },
+              {
+                "type": "ALIBI",
+                "description": "[p]は[start]から[end]まで[place]の途切れない映像に映っていた。その間に外へ出ていない。",
+                "fields": [
+                  "p",
+                  "start",
+                  "end",
+                  "place"
+                ],
+                "qualifiers": [
+                  "continuous_video",
+                  "no_exit"
+                ],
+                "default_source": "machine"
+              },
+              {
+                "type": "CLAIM",
+                "description": "[p]は「[q]の仕業に間違いない」と言った。ただし[scope]で、手元や顔を確認した話ではなかった。",
+                "fields": [
+                  "p",
+                  "q",
+                  "scope"
+                ],
+                "qualifiers": [],
+                "default_source": "speech"
+              },
+              {
+                "type": "TESTIMONY",
+                "description": "[p]は「[quote]。確信はない」と話した。[scope]ので、後で記録と照合するつもりだ。",
+                "fields": [
+                  "p",
+                  "quote",
+                  "scope"
+                ],
+                "qualifiers": [],
+                "default_source": "speech"
+              },
+              {
+                "type": "OFFICIAL",
+                "description": "[p]は管理AIに、[v]の死を[label]として登録した。診察や現場確認はせず、本人の申告だけによる登録だった。",
+                "fields": [
+                  "p",
+                  "v",
+                  "label"
+                ],
+                "qualifiers": [],
+                "default_source": "speech"
+              },
+              {
+                "type": "REVISION",
+                "description": "[owner]の[t]の記録は版[old]から版[new]へ変更されている。変更内容の本文は残っていない。監査用の時刻だけが保存されている。",
+                "fields": [
+                  "owner",
+                  "t",
+                  "old",
+                  "new"
+                ],
+                "qualifiers": [],
+                "default_source": "machine"
+              },
+              {
+                "type": "EXPOSE",
+                "description": "時刻[t]、[p]は[source]で[route]。これが最初の接触で、その前には接触していない。",
+                "fields": [
+                  "t",
+                  "p",
+                  "source",
+                  "route"
+                ],
+                "qualifiers": [
+                  "first_contact"
+                ],
+                "default_source": "direct"
+              },
+              {
+                "type": "TEST",
+                "description": "時刻[t]、[p]の[method]の測定票を読んだ。値は[value][unit]、判定欄は「[meaning]」。票の人物と測定した身体を照合した。",
+                "fields": [
+                  "t",
+                  "p",
+                  "method",
+                  "value",
+                  "unit",
+                  "meaning"
+                ],
+                "qualifiers": [],
+                "default_source": "document"
+              },
+              {
+                "type": "RATIONS",
+                "description": "時刻[t]から[p]への食事の配達が止まった。倉庫の備蓄は別に残っていたが、その人の受領欄はずっと空白だった。",
+                "fields": [
+                  "t",
+                  "p"
+                ],
+                "qualifiers": [],
+                "default_source": "document"
+              },
+              {
+                "type": "STARVE",
+                "description": "時刻[t]、[p]は食事を受け取れないまま[days]日が経ち、ひどくやせて動けなくなった。脈と呼吸が止まり、蘇生しても戻らなかった。",
+                "fields": [
+                  "t",
+                  "p",
+                  "days"
+                ],
+                "qualifiers": [
+                  "pulse_stopped",
+                  "no_recovery"
+                ],
+                "default_source": "direct"
+              },
+              {
+                "type": "TERMINAL",
+                "description": "時刻[t]、[p]の[sign]が続き、脈と呼吸が止まった。処置を続けても戻らず、死亡を確認した。",
+                "fields": [
+                  "t",
+                  "p",
+                  "sign"
+                ],
+                "qualifiers": [
+                  "pulse_stopped",
+                  "no_recovery"
+                ],
+                "default_source": "direct"
+              },
+              {
+                "type": "COLLAPSE",
+                "description": "時刻[t]、[p]が救助に入った通路で、腐食した同じ梁が一度に崩れた。瓦礫の下から身体を出したが、脈と呼吸が戻らなかった。",
+                "fields": [
+                  "t",
+                  "p"
+                ],
+                "qualifiers": [
+                  "pulse_stopped",
+                  "single_collapse"
+                ],
+                "default_source": "direct"
+              },
+              {
+                "type": "BODY_SENSOR",
+                "description": "時刻[t]、壁面の医療端末で[p]の身体の脈と呼吸が止まった。固定カメラでも同じ身体を確認し、その後も動かず回復していない。チップの通信切断だけによる判定ではない。",
+                "fields": [
+                  "t",
+                  "p"
+                ],
+                "qualifiers": [
+                  "pulse_stopped",
+                  "fixed_camera"
+                ],
+                "default_source": "machine"
+              },
+              {
+                "type": "SUPPLIES",
+                "description": "時刻[t]、残る食料は[state]。倉庫内を数えて確認した。各人への配達量とは別の集計だ。",
+                "fields": [
+                  "t",
+                  "state"
+                ],
+                "qualifiers": [],
+                "default_source": "direct"
+              },
+              {
+                "type": "LIVE",
+                "description": "時刻[t]、[p]の当日の映像と身体計測を確認した。身体は温かく、呼吸と脈がある。[place]で動いている。",
+                "fields": [
+                  "t",
+                  "p",
+                  "place"
+                ],
+                "qualifiers": [
+                  "pulse",
+                  "breathing"
+                ],
+                "default_source": "machine"
+              },
+              {
+                "type": "FEATURE",
+                "description": "[p]の右手には[feature]がある。全員の手を検めたが、この特徴を持つのは一人だけだった。",
+                "fields": [
+                  "p",
+                  "feature"
+                ],
+                "qualifiers": [
+                  "unique_among_residents"
+                ],
+                "default_source": "direct"
+              },
+              {
+                "type": "CHIP",
+                "description": "[owner]の身体から摘出されたチップの製造番号は[serial]だった。[t]にその同じ番号が別の身体で再接続された。元の身体は動いていない。",
+                "fields": [
+                  "owner",
+                  "serial",
+                  "t"
+                ],
+                "qualifiers": [],
+                "default_source": "machine"
+              },
+              {
+                "type": "CARRIER",
+                "description": "時刻[t]、製造番号[serial]のチップから届く映像の右手には[feature]がある。脈と呼吸があり、その身体は[place]で動いている。",
+                "fields": [
+                  "t",
+                  "serial",
+                  "feature",
+                  "place"
+                ],
+                "qualifiers": [
+                  "pulse",
+                  "breathing"
+                ],
+                "default_source": "machine"
+              },
+              {
+                "type": "RAID",
+                "description": "時刻[t]、[v]がチップ認証を持たない外来者の刃物で刺された。直後に脈と呼吸が止まり戻らなかった。外来者は外套のまま[place]へ向かった。",
+                "fields": [
+                  "t",
+                  "v",
+                  "place"
+                ],
+                "qualifiers": [
+                  "unauthenticated_attacker",
+                  "pulse_stopped"
+                ],
+                "default_source": "direct"
+              },
+              {
+                "type": "HATCH",
+                "description": "時刻[t]、外部ハッチが[side]から認証なしで開いた。この通路以外に出入口はなく、認証なしの開放一回につき一人だけ通過した。",
+                "fields": [
+                  "t",
+                  "side"
+                ],
+                "qualifiers": [
+                  "unauthenticated",
+                  "only_entrance",
+                  "one_person"
+                ],
+                "default_source": "direct"
+              },
+              {
+                "type": "PLAN",
+                "description": "[p]の記録に「[goal]ために[choice]を選んだ」とあった。",
+                "fields": [
+                  "p",
+                  "goal",
+                  "choice"
+                ],
+                "qualifiers": [],
+                "default_source": "memory"
+              }
+            ],
+            "conventions": "observerは書き手自身の参照。一人称（私、俺、僕等）はobserverへ対応させる。source_kindは知った経路。modalityのobservedは直接観察・本人の記憶・実際に閲覧した文書/機械記録の内容を記すこと。reportedは他者の発言を引用した場合、inferredは推測。過去形や「書類に記された」だけをreportedにしない。polarityは出来事自体の肯否。鍵を受領したならaffirmative、受領していないならnegative。複製や貸与なしは個別qualifiersで保持する。文型は語彙説明でありコピー不要。NEXTはpがqの直後、PREVIOUSはpがqの直前、BEFOREはpがqより後（隣接不要）。WORKは当番登録と実際の作業の両方。ACKは警告の読解・署名・復唱・解除の選択で、単なる応答ではない。LAST_SENSEは意識を失う前の本人の最後の感覚。",
+            "note": "期待する証拠一覧は与えていない。本文に明示されたものだけ抽出する。fieldは語彙のfieldsにあるものだけ。valuesは文型の意味へ正規化し、引用は本文をそのままコピー。LAST_SENSEの本人と現在時刻だけはobserver/timeというプログラムのヘッダーで確定する。他の過去の操作時刻・区間は本文に必要。足りない情報を補完せず、そのfieldは省く。"
+          },
+          "extraction": {
+            "observations": [
+              {
+                "type": "KEY",
+                "fields": [
+                  {
+                    "key": "p",
+                    "value": "<P1>"
+                  },
+                  {
+                    "key": "qualification",
+                    "value": "電気の専任資格"
+                  },
+                  {
+                    "key": "serial",
+                    "value": "707"
+                  },
+                  {
+                    "key": "start",
+                    "value": "D04 09:45"
+                  },
+                  {
+                    "key": "end",
+                    "value": "D04 10:21"
+                  }
+                ],
+                "qualifiers": [
+                  {
+                    "key": "no_duplicate",
+                    "value": true
+                  },
+                  {
+                    "key": "no_transfer",
+                    "value": true
+                  },
+                  {
+                    "key": "qualified",
+                    "value": true
+                  }
+                ],
+                "source_kind": "document",
+                "modality": "observed",
+                "polarity": "affirmative",
+                "quote": "閲覧した書類には、鍵707はD04 09:45から10:21まで<P1>に渡され、重複も譲渡もなかったとある。電気の専任資格も照合済みで、条件を満たしていた。"
+              }
+            ],
+            "additions": [
+              {
+                "kind": "hope_or_intention",
+                "quote": "仲間を守るための引き継ぎが、どうか正しいものでありますように。",
+                "reason": "仲間を守る意図や引き継ぎへの願いを述べているが、出来事の証拠には当たらない。"
+              }
+            ]
+          },
+          "auditInput": {
+            "text": "閲覧した書類には、鍵707はD04 09:45から10:21まで<P1>に渡され、重複も譲渡もなかったとある。電気の専任資格も照合済みで、条件を満たしていた。仲間を守るための引き継ぎが、どうか正しいものでありますように。",
+            "extraction": {
+              "observations": [
+                {
+                  "type": "KEY",
+                  "fields": [
+                    {
+                      "key": "p",
+                      "value": "<P1>"
+                    },
+                    {
+                      "key": "qualification",
+                      "value": "電気の専任資格"
+                    },
+                    {
+                      "key": "serial",
+                      "value": "707"
+                    },
+                    {
+                      "key": "start",
+                      "value": "D04 09:45"
+                    },
+                    {
+                      "key": "end",
+                      "value": "D04 10:21"
+                    }
+                  ],
+                  "qualifiers": [
+                    {
+                      "key": "no_duplicate",
+                      "value": true
+                    },
+                    {
+                      "key": "no_transfer",
+                      "value": true
+                    },
+                    {
+                      "key": "qualified",
+                      "value": true
+                    }
+                  ],
+                  "source_kind": "document",
+                  "modality": "observed",
+                  "polarity": "affirmative",
+                  "quote": "閲覧した書類には、鍵707はD04 09:45から10:21まで<P1>に渡され、重複も譲渡もなかったとある。電気の専任資格も照合済みで、条件を満たしていた。"
+                }
+              ],
+              "additions": [
+                {
+                  "kind": "hope_or_intention",
+                  "quote": "仲間を守るための引き継ぎが、どうか正しいものでありますように。",
+                  "reason": "仲間を守る意図や引き継ぎへの願いを述べているが、出来事の証拠には当たらない。"
+                }
+              ]
+            },
+            "required": [
+              {
+                "evidence_id": "e25",
+                "predicate": "KEY",
+                "args": {
+                  "p": "<P1>",
+                  "serial": "707",
+                  "start": "D04 09:45",
+                  "end": "D04 10:21",
+                  "qualification": "電気の専任資格"
+                },
+                "subject": "<P1>",
+                "object": null,
+                "observer": "<P2>",
+                "source_kind": "document",
+                "modality": "observed",
+                "polarity": "affirmative",
+                "qualifiers": {
+                  "no_duplicate": true,
+                  "no_transfer": true,
+                  "qualified": true
+                },
+                "time": null,
+                "interval": [
+                  "D04 09:45",
+                  "D04 10:21"
+                ],
+                "value": "707",
+                "unit": null,
+                "required_precision": "minute",
+                "epistemic_scope": "指定された情報源が示す範囲。発言は事実へ昇格しない。他人の内面を創作しない。",
+                "critical_fields": [
+                  "p",
+                  "serial",
+                  "start",
+                  "end",
+                  "qualification",
+                  "source_kind",
+                  "modality",
+                  "polarity",
+                  "no_duplicate",
+                  "no_transfer",
+                  "qualified"
+                ]
+              }
+            ],
+            "allowed_context": {
+              "persona": {
+                "pronoun": "私",
+                "personality": "信心深い",
+                "goal": "仲間を救う"
+              },
+              "public_rules": "支給上着の縫い印は、区画・職能分類・入居の帯のいずれか一つの系統で配られる。同じ系統には同じ印、異なる系統には違う印を渡す。入居の帯は01〜03番と04番以降。入居台帳は受付順の連続した記録で、欠番や抹消はない。当番表の担当欄には登録資格を持つ者だけを載せ、手伝いは補助欄へ記す。入居受付票の番号はその台帳の入居順を表す。線量計はmSvで積算し、このシェルターの医療票では900mSv以上を致死域の被曝と判定する。架空病Kの試薬は判定コード1を感染陽性とする。",
+              "scope": "示された観察・文書・会話のみ。他人の内面、未提示の道具・出来事・特徴を足さない。",
+              "observer": "<P2>",
+              "time": "D04 10:30",
+              "conventions": "observerは書き手自身の参照。一人称（私、俺、僕等）はobserverへ対応させる。source_kindは知った経路。modalityのobservedは直接観察・本人の記憶・実際に閲覧した文書/機械記録の内容を記すこと。reportedは他者の発言を引用した場合、inferredは推測。過去形や「書類に記された」だけをreportedにしない。polarityは出来事自体の肯否。鍵を受領したならaffirmative、受領していないならnegative。複製や貸与なしは個別qualifiersで保持する。文型は語彙説明でありコピー不要。NEXTはpがqの直後、PREVIOUSはpがqの直前、BEFOREはpがqより後（隣接不要）。WORKは当番登録と実際の作業の両方。ACKは警告の読解・署名・復唱・解除の選択で、単なる応答ではない。LAST_SENSEは意識を失う前の本人の最後の感覚。",
+              "header_scope": "LAST_SENSEの本人と現在時刻だけは記録ヘッダーが保証する。それ以外の操作時刻は本文に必要。"
+            }
+          },
+          "audit": {
+            "grounding": [
+              {
+                "index": 0,
+                "supported": true,
+                "quote": "閲覧した書類には、鍵707はD04 09:45から10:21まで<P1>に渡され、重複も譲渡もなかったとある。電気の専任資格も照合済みで、条件を満たしていた。",
+                "reason": "引用は書類を閲覧したこと、鍵の受け渡し先・番号・時間、重複と譲渡がなかったこと、電気の専任資格が照合され条件を満たしたことを示している。"
+              }
+            ],
+            "equivalences": [
+              {
+                "index": 0,
+                "field": "p",
+                "expected": "<P1>",
+                "actual": "<P1>",
+                "equivalent": true,
+                "quote": "鍵707はD04 09:45から10:21まで<P1>に渡され"
+              },
+              {
+                "index": 0,
+                "field": "serial",
+                "expected": "707",
+                "actual": "707",
+                "equivalent": true,
+                "quote": "鍵707"
+              },
+              {
+                "index": 0,
+                "field": "start",
+                "expected": "D04 09:45",
+                "actual": "D04 09:45",
+                "equivalent": true,
+                "quote": "D04 09:45から10:21まで"
+              },
+              {
+                "index": 0,
+                "field": "end",
+                "expected": "D04 10:21",
+                "actual": "D04 10:21",
+                "equivalent": true,
+                "quote": "D04 09:45から10:21まで"
+              },
+              {
+                "index": 0,
+                "field": "qualification",
+                "expected": "電気の専任資格",
+                "actual": "電気の専任資格",
+                "equivalent": true,
+                "quote": "電気の専任資格も照合済みで、条件を満たしていた。"
+              },
+              {
+                "index": 0,
+                "field": "source_kind",
+                "expected": "document",
+                "actual": "document",
+                "equivalent": true,
+                "quote": "閲覧した書類には"
+              },
+              {
+                "index": 0,
+                "field": "modality",
+                "expected": "observed",
+                "actual": "observed",
+                "equivalent": true,
+                "quote": "閲覧した書類には"
+              },
+              {
+                "index": 0,
+                "field": "polarity",
+                "expected": "affirmative",
+                "actual": "affirmative",
+                "equivalent": true,
+                "quote": "鍵707はD04 09:45から10:21まで<P1>に渡され"
+              },
+              {
+                "index": 0,
+                "field": "no_duplicate",
+                "expected": "true",
+                "actual": "true",
+                "equivalent": true,
+                "quote": "重複も…なかった"
+              },
+              {
+                "index": 0,
+                "field": "no_transfer",
+                "expected": "true",
+                "actual": "true",
+                "equivalent": true,
+                "quote": "譲渡もなかった"
+              },
+              {
+                "index": 0,
+                "field": "qualified",
+                "expected": "true",
+                "actual": "true",
+                "equivalent": true,
+                "quote": "電気の専任資格も照合済みで、条件を満たしていた。"
+              }
+            ],
+            "additions": [
+              {
+                "kind": "allowed",
+                "quote": "仲間を守るための引き継ぎが、どうか正しいものでありますように。",
+                "reason": "正しいものであるよう願う気持ちは自己の感情・願いとして許容される。仲間を守る目標も許可された人物設定と整合する。これは鍵の証拠には加えていない。"
+              }
+            ],
+            "quality": [],
+            "uncertain": false
+          },
+          "pass": true,
+          "issues": [],
+          "quality": []
+        }
+      ],
+      "origin": "llm"
+    }
+  ],
+  "scope": "全文生成・独立した意味抽出・引用監査。数学的な意味保証ではない。",
+  "metrics": {
+    "target": 2,
+    "initiallyAccepted": 2,
+    "accepted": 2,
+    "fallback": 0,
+    "initialAcceptanceRate": 1,
+    "finalAcceptanceRate": 1,
+    "fallbackRate": 0,
+    "automaticClassifications": {},
+    "finalAutomaticClassifications": {},
+    "uncertain": 0,
+    "unresolvedUncertain": 0,
+    "qualityWarnings": 0,
+    "humanConfirmedSemanticChanges": null,
+    "humanConfirmedFalsePositives": null
+  },
+  "verification": {
+    "pass": true,
+    "errors": [],
+    "reach": {
+      "reachable": true,
+      "known": {},
+      "steps": [
+        [
+          "A-04-23"
+        ],
+        [
+          "C-03-31"
+        ],
+        [
+          "B-05-11",
+          "C-06-41"
+        ],
+        [
+          "A-07-52",
+          "B-08-32"
+        ]
+      ],
+      "perStep": [
+        1,
+        1,
+        2,
+        2
+      ],
+      "errors": [],
+      "derivations": [
+        {
+          "p": "A-04-23",
+          "id": "A-04-23",
+          "D": [
+            "log:B-02-51#1",
+            "log:A-01-51#0",
+            "log:B-02-51#0"
+          ],
+          "J": [
+            "log:B-02-51#1"
+          ],
+          "E": [
+            "log:A-01-51#2",
+            "log:B-02-51#2"
+          ],
+          "step": 1
+        },
+        {
+          "p": "C-03-31",
+          "id": "C-03-31",
+          "D": [
+            "log:A-01-51#1"
+          ],
+          "J": [
+            "log:A-04-23#4",
+            "log:A-01-51#5"
+          ],
+          "E": [
+            "log:A-01-51#2",
+            "log:B-02-51#2",
+            "log:A-04-23#1"
+          ],
+          "step": 2
+        },
+        {
+          "p": "B-05-11",
+          "id": "B-05-11",
+          "D": [
+            "log:C-03-31#0",
+            "log:A-01-51#0",
+            "log:B-02-51#0",
+            "log:B-02-51#1"
+          ],
+          "J": [
+            "log:C-03-31#0"
+          ],
+          "E": [
+            "log:A-01-51#2",
+            "log:B-02-51#2",
+            "log:C-03-31#1",
+            "log:A-04-23#1"
+          ],
+          "step": 3
+        },
+        {
+          "p": "C-06-41",
+          "id": "C-06-41",
+          "D": [
+            "log:A-04-23#0",
+            "log:A-01-51#0",
+            "log:B-02-51#0",
+            "log:B-02-51#1"
+          ],
+          "J": [
+            "log:A-04-23#0"
+          ],
+          "E": [
+            "log:A-01-51#2",
+            "log:B-02-51#2",
+            "log:C-03-31#1",
+            "log:A-04-23#1"
+          ],
+          "step": 3
+        },
+        {
+          "p": "A-07-52",
+          "id": "A-07-52",
+          "D": [
+            "log:B-05-11#0",
+            "log:A-01-51#0",
+            "log:B-02-51#0",
+            "log:B-02-51#1",
+            "log:C-03-31#0",
+            "log:A-04-23#0"
+          ],
+          "J": [
+            "log:B-05-11#0"
+          ],
+          "E": [
+            "log:A-01-51#2",
+            "log:B-02-51#2",
+            "log:C-03-31#1",
+            "log:A-04-23#1",
+            "log:B-05-11#1",
+            "log:C-06-41#1"
+          ],
+          "step": 4
+        },
+        {
+          "p": "B-08-32",
+          "id": "B-08-32",
+          "D": [
+            "log:C-06-41#0",
+            "log:A-01-51#0",
+            "log:B-02-51#0",
+            "log:B-02-51#1",
+            "log:C-03-31#0",
+            "log:A-04-23#0"
+          ],
+          "J": [
+            "log:C-06-41#0"
+          ],
+          "E": [
+            "log:A-01-51#2",
+            "log:B-02-51#2",
+            "log:C-03-31#1",
+            "log:A-04-23#1",
+            "log:B-05-11#1",
+            "log:C-06-41#1"
+          ],
+          "step": 4
+        }
+      ],
+      "partialSteps": [
+        {
+          "step": 0,
+          "conclusions": [
+            "A-01-51:dead:radiation",
+            "B-02-51:alive:",
+            "A-04-23:dead:murder,infection,radiation,starvation,accident,intruder",
+            "B-05-11:dead:murder,infection,radiation,starvation,accident,intruder",
+            "C-06-41:dead:murder,infection,radiation,starvation,accident,intruder",
+            "A-07-52:dead:murder,infection,radiation,starvation,accident,intruder",
+            "B-08-32:dead:murder,infection,radiation,starvation,accident,intruder"
+          ],
+          "sources": [
+            "dialogue:#0",
+            "dialogue:#1",
+            "dialogue:#2",
+            "dialogue:#3",
+            "dialogue:#4",
+            "log:A-01-51#0",
+            "log:A-01-51#1",
+            "log:A-01-51#2",
+            "log:A-01-51#3",
+            "log:A-01-51#4",
+            "log:A-01-51#5",
+            "log:A-01-51#6",
+            "log:B-02-51#0",
+            "log:B-02-51#1",
+            "log:B-02-51#2",
+            "log:B-02-51#3",
+            "log:B-02-51#4",
+            "log:B-02-51#5",
+            "log:B-02-51#6",
+            "log:B-02-51#7",
+            "log:B-02-51#8",
+            "log:B-02-51#9",
+            "log:B-02-51#10"
+          ]
+        },
+        {
+          "step": 1,
+          "conclusions": [
+            "A-01-51:dead:radiation",
+            "B-02-51:alive:",
+            "A-04-23:dead:radiation",
+            "B-05-11:dead:murder,infection,radiation,starvation,accident,intruder",
+            "C-06-41:dead:murder,infection,radiation,starvation,accident,intruder",
+            "A-07-52:dead:murder,infection,radiation,starvation,accident,intruder",
+            "B-08-32:dead:murder,infection,radiation,starvation,accident,intruder"
+          ],
+          "sources": [
+            "dialogue:#0",
+            "dialogue:#1",
+            "dialogue:#2",
+            "dialogue:#3",
+            "dialogue:#4",
+            "log:A-01-51#0",
+            "log:A-01-51#1",
+            "log:A-01-51#2",
+            "log:A-01-51#3",
+            "log:A-01-51#4",
+            "log:A-01-51#5",
+            "log:A-01-51#6",
+            "log:B-02-51#0",
+            "log:B-02-51#1",
+            "log:B-02-51#2",
+            "log:B-02-51#3",
+            "log:B-02-51#4",
+            "log:B-02-51#5",
+            "log:B-02-51#6",
+            "log:B-02-51#7",
+            "log:B-02-51#8",
+            "log:B-02-51#9",
+            "log:B-02-51#10",
+            "log:A-04-23#0",
+            "log:A-04-23#1",
+            "log:A-04-23#2",
+            "log:A-04-23#3",
+            "log:A-04-23#4",
+            "log:A-04-23#5",
+            "log:A-04-23#6"
+          ]
+        },
+        {
+          "step": 2,
+          "conclusions": [
+            "A-01-51:dead:radiation",
+            "B-02-51:alive:",
+            "C-03-31:alive:",
+            "A-04-23:dead:radiation",
+            "B-05-11:dead:murder",
+            "C-06-41:dead:murder,infection,radiation,starvation,accident,intruder",
+            "A-07-52:dead:murder,infection,radiation,starvation,accident,intruder",
+            "B-08-32:dead:murder,infection,radiation,starvation,accident,intruder"
+          ],
+          "sources": [
+            "dialogue:#0",
+            "dialogue:#1",
+            "dialogue:#2",
+            "dialogue:#3",
+            "dialogue:#4",
+            "log:A-01-51#0",
+            "log:A-01-51#1",
+            "log:A-01-51#2",
+            "log:A-01-51#3",
+            "log:A-01-51#4",
+            "log:A-01-51#5",
+            "log:A-01-51#6",
+            "log:B-02-51#0",
+            "log:B-02-51#1",
+            "log:B-02-51#2",
+            "log:B-02-51#3",
+            "log:B-02-51#4",
+            "log:B-02-51#5",
+            "log:B-02-51#6",
+            "log:B-02-51#7",
+            "log:B-02-51#8",
+            "log:B-02-51#9",
+            "log:B-02-51#10",
+            "log:C-03-31#0",
+            "log:C-03-31#1",
+            "log:C-03-31#2",
+            "log:C-03-31#3",
+            "log:C-03-31#4",
+            "log:A-04-23#0",
+            "log:A-04-23#1",
+            "log:A-04-23#2",
+            "log:A-04-23#3",
+            "log:A-04-23#4",
+            "log:A-04-23#5",
+            "log:A-04-23#6"
+          ]
+        },
+        {
+          "step": 3,
+          "conclusions": [
+            "A-01-51:dead:radiation",
+            "B-02-51:alive:",
+            "C-03-31:alive:",
+            "A-04-23:dead:radiation",
+            "B-05-11:dead:murder",
+            "C-06-41:dead:radiation",
+            "A-07-52:dead:murder,infection,radiation,starvation,accident,intruder",
+            "B-08-32:dead:murder,infection,radiation,starvation,accident,intruder"
+          ],
+          "sources": [
+            "dialogue:#0",
+            "dialogue:#1",
+            "dialogue:#2",
+            "dialogue:#3",
+            "dialogue:#4",
+            "log:A-01-51#0",
+            "log:A-01-51#1",
+            "log:A-01-51#2",
+            "log:A-01-51#3",
+            "log:A-01-51#4",
+            "log:A-01-51#5",
+            "log:A-01-51#6",
+            "log:B-02-51#0",
+            "log:B-02-51#1",
+            "log:B-02-51#2",
+            "log:B-02-51#3",
+            "log:B-02-51#4",
+            "log:B-02-51#5",
+            "log:B-02-51#6",
+            "log:B-02-51#7",
+            "log:B-02-51#8",
+            "log:B-02-51#9",
+            "log:B-02-51#10",
+            "log:C-03-31#0",
+            "log:C-03-31#1",
+            "log:C-03-31#2",
+            "log:C-03-31#3",
+            "log:C-03-31#4",
+            "log:A-04-23#0",
+            "log:A-04-23#1",
+            "log:A-04-23#2",
+            "log:A-04-23#3",
+            "log:A-04-23#4",
+            "log:A-04-23#5",
+            "log:A-04-23#6",
+            "log:B-05-11#0",
+            "log:B-05-11#1",
+            "log:C-06-41#0",
+            "log:C-06-41#1",
+            "log:C-06-41#2",
+            "log:C-06-41#3",
+            "log:C-06-41#4"
+          ]
+        },
+        {
+          "step": 4,
+          "conclusions": [
+            "A-01-51:dead:radiation",
+            "B-02-51:alive:",
+            "C-03-31:alive:",
+            "A-04-23:dead:radiation",
+            "B-05-11:dead:murder",
+            "C-06-41:dead:radiation",
+            "A-07-52:dead:radiation",
+            "B-08-32:dead:radiation"
+          ],
+          "sources": [
+            "dialogue:#0",
+            "dialogue:#1",
+            "dialogue:#2",
+            "dialogue:#3",
+            "dialogue:#4",
+            "log:A-01-51#0",
+            "log:A-01-51#1",
+            "log:A-01-51#2",
+            "log:A-01-51#3",
+            "log:A-01-51#4",
+            "log:A-01-51#5",
+            "log:A-01-51#6",
+            "log:B-02-51#0",
+            "log:B-02-51#1",
+            "log:B-02-51#2",
+            "log:B-02-51#3",
+            "log:B-02-51#4",
+            "log:B-02-51#5",
+            "log:B-02-51#6",
+            "log:B-02-51#7",
+            "log:B-02-51#8",
+            "log:B-02-51#9",
+            "log:B-02-51#10",
+            "log:C-03-31#0",
+            "log:C-03-31#1",
+            "log:C-03-31#2",
+            "log:C-03-31#3",
+            "log:C-03-31#4",
+            "log:A-04-23#0",
+            "log:A-04-23#1",
+            "log:A-04-23#2",
+            "log:A-04-23#3",
+            "log:A-04-23#4",
+            "log:A-04-23#5",
+            "log:A-04-23#6",
+            "log:B-05-11#0",
+            "log:B-05-11#1",
+            "log:C-06-41#0",
+            "log:C-06-41#1",
+            "log:C-06-41#2",
+            "log:C-06-41#3",
+            "log:C-06-41#4",
+            "log:A-07-52#0",
+            "log:A-07-52#1",
+            "log:B-08-32#0",
+            "log:B-08-32#1"
+          ]
+        }
+      ],
+      "candidateRules": [
+        {
+          "attr": "district",
+          "mapping": {
+            "葉形": "A",
+            "輪形": "B",
+            "矢形": "C"
+          }
+        }
+      ],
+      "rules": [
+        {
+          "rule": "district:{\"葉形\":\"A\",\"輪形\":\"B\",\"矢形\":\"C\"}",
+          "step": 0
+        }
+      ]
+    },
+    "outcome": {
+      "people": {
+        "A-01-51": {
+          "status": "dead",
+          "causes": [
+            "radiation"
+          ],
+          "killers": [],
+          "derivations": [
+            {
+              "cause": "radiation",
+              "k": null,
+              "sources": [
+                "log:B-02-51#4",
+                "log:A-01-51#3"
+              ],
+              "rule": "接触→検査→症状の経過→死亡"
+            }
+          ]
+        },
+        "B-02-51": {
+          "status": "alive",
+          "causes": null,
+          "killers": [],
+          "derivations": [
+            {
+              "sources": [
+                "log:B-02-51#9"
+              ],
+              "rule": "当日の身体計測と映像"
+            }
+          ]
+        },
+        "C-03-31": {
+          "status": "alive",
+          "causes": null,
+          "killers": [],
+          "derivations": [
+            {
+              "sources": [
+                "log:C-03-31#4"
+              ],
+              "rule": "当日の身体計測と映像"
+            }
+          ]
+        },
+        "A-04-23": {
+          "status": "dead",
+          "causes": [
+            "radiation"
+          ],
+          "killers": [],
+          "derivations": [
+            {
+              "cause": "radiation",
+              "k": null,
+              "sources": [
+                "log:B-02-51#5",
+                "log:A-04-23#3"
+              ],
+              "rule": "接触→検査→症状の経過→死亡"
+            }
+          ]
+        },
+        "B-05-11": {
+          "status": "dead",
+          "causes": [
+            "murder"
+          ],
+          "killers": [
+            "C-03-31"
+          ],
+          "derivations": [
+            {
+              "cause": "murder",
+              "k": "C-03-31",
+              "sources": [
+                "log:B-02-51#3",
+                "log:A-04-23#4",
+                "log:A-01-51#5",
+                "log:C-03-31#3",
+                "dialogue:#0",
+                "log:A-01-51#4"
+              ],
+              "rule": "故障認識＋専用鍵＋通電履歴＋安全を偽る発言＋身体の感電"
+            }
+          ]
+        },
+        "C-06-41": {
+          "status": "dead",
+          "causes": [
+            "radiation"
+          ],
+          "killers": [],
+          "derivations": [
+            {
+              "cause": "radiation",
+              "k": null,
+              "sources": [
+                "log:B-02-51#6",
+                "log:C-06-41#2"
+              ],
+              "rule": "接触→検査→症状の経過→死亡"
+            }
+          ]
+        },
+        "A-07-52": {
+          "status": "dead",
+          "causes": [
+            "radiation"
+          ],
+          "killers": [],
+          "derivations": [
+            {
+              "cause": "radiation",
+              "k": null,
+              "sources": [
+                "log:B-02-51#7",
+                "log:A-07-52#0"
+              ],
+              "rule": "接触→検査→症状の経過→死亡"
+            }
+          ]
+        },
+        "B-08-32": {
+          "status": "dead",
+          "causes": [
+            "radiation"
+          ],
+          "killers": [],
+          "derivations": [
+            {
+              "cause": "radiation",
+              "k": null,
+              "sources": [
+                "log:B-02-51#8",
+                "log:B-08-32#0"
+              ],
+              "rule": "接触→検査→症状の経過→死亡"
+            }
+          ]
+        }
+      },
+      "intruder": null,
+      "contested": [
+        {
+          "claim": "dialogue:#2",
+          "rejectedBy": [
+            "log:C-06-41#3"
+          ],
+          "resolved": true,
+          "reason": "連続映像の所在が主張された現場と両立しない"
+        }
+      ],
+      "verdict": {
+        "result": "danger",
+        "reasons": [
+          "潜伏者",
+          "汚染"
+        ]
+      },
+      "safetySources": [
+        "log:B-02-51#4",
+        "log:A-01-51#3",
+        "log:B-02-51#9",
+        "log:C-03-31#4",
+        "log:B-02-51#5",
+        "log:A-04-23#3",
+        "log:B-02-51#3",
+        "log:A-04-23#4",
+        "log:A-01-51#5",
+        "log:C-03-31#3",
+        "dialogue:#0",
+        "log:A-01-51#4",
+        "log:B-02-51#6",
+        "log:C-06-41#2",
+        "log:B-02-51#7",
+        "log:A-07-52#0",
+        "log:B-02-51#8",
+        "log:B-08-32#0",
+        "log:B-02-51#10"
+      ],
+      "partial": [
+        "A-01-51:dead:radiation",
+        "B-02-51:alive:",
+        "C-03-31:alive:",
+        "A-04-23:dead:radiation",
+        "B-05-11:dead:murder",
+        "C-06-41:dead:radiation",
+        "A-07-52:dead:radiation",
+        "B-08-32:dead:radiation"
+      ]
+    },
+    "truth": {
+      "errors": []
+    },
+    "text": {
+      "errors": []
+    },
+    "trace": {
+      "identity": [
+        {
+          "p": "A-04-23",
+          "id": "A-04-23",
+          "D": [
+            "log:B-02-51#1",
+            "log:A-01-51#0",
+            "log:B-02-51#0"
+          ],
+          "J": [
+            "log:B-02-51#1"
+          ],
+          "E": [
+            "log:A-01-51#2",
+            "log:B-02-51#2"
+          ],
+          "step": 1
+        },
+        {
+          "p": "C-03-31",
+          "id": "C-03-31",
+          "D": [
+            "log:A-01-51#1"
+          ],
+          "J": [
+            "log:A-04-23#4",
+            "log:A-01-51#5"
+          ],
+          "E": [
+            "log:A-01-51#2",
+            "log:B-02-51#2",
+            "log:A-04-23#1"
+          ],
+          "step": 2
+        },
+        {
+          "p": "B-05-11",
+          "id": "B-05-11",
+          "D": [
+            "log:C-03-31#0",
+            "log:A-01-51#0",
+            "log:B-02-51#0",
+            "log:B-02-51#1"
+          ],
+          "J": [
+            "log:C-03-31#0"
+          ],
+          "E": [
+            "log:A-01-51#2",
+            "log:B-02-51#2",
+            "log:C-03-31#1",
+            "log:A-04-23#1"
+          ],
+          "step": 3
+        },
+        {
+          "p": "C-06-41",
+          "id": "C-06-41",
+          "D": [
+            "log:A-04-23#0",
+            "log:A-01-51#0",
+            "log:B-02-51#0",
+            "log:B-02-51#1"
+          ],
+          "J": [
+            "log:A-04-23#0"
+          ],
+          "E": [
+            "log:A-01-51#2",
+            "log:B-02-51#2",
+            "log:C-03-31#1",
+            "log:A-04-23#1"
+          ],
+          "step": 3
+        },
+        {
+          "p": "A-07-52",
+          "id": "A-07-52",
+          "D": [
+            "log:B-05-11#0",
+            "log:A-01-51#0",
+            "log:B-02-51#0",
+            "log:B-02-51#1",
+            "log:C-03-31#0",
+            "log:A-04-23#0"
+          ],
+          "J": [
+            "log:B-05-11#0"
+          ],
+          "E": [
+            "log:A-01-51#2",
+            "log:B-02-51#2",
+            "log:C-03-31#1",
+            "log:A-04-23#1",
+            "log:B-05-11#1",
+            "log:C-06-41#1"
+          ],
+          "step": 4
+        },
+        {
+          "p": "B-08-32",
+          "id": "B-08-32",
+          "D": [
+            "log:C-06-41#0",
+            "log:A-01-51#0",
+            "log:B-02-51#0",
+            "log:B-02-51#1",
+            "log:C-03-31#0",
+            "log:A-04-23#0"
+          ],
+          "J": [
+            "log:C-06-41#0"
+          ],
+          "E": [
+            "log:A-01-51#2",
+            "log:B-02-51#2",
+            "log:C-03-31#1",
+            "log:A-04-23#1",
+            "log:B-05-11#1",
+            "log:C-06-41#1"
+          ],
+          "step": 4
+        }
+      ],
+      "people": {
+        "A-01-51": {
+          "status": "dead",
+          "causes": [
+            "radiation"
+          ],
+          "killers": [],
+          "derivations": [
+            {
+              "cause": "radiation",
+              "k": null,
+              "sources": [
+                "log:B-02-51#4",
+                "log:A-01-51#3"
+              ],
+              "rule": "接触→検査→症状の経過→死亡"
+            }
+          ]
+        },
+        "B-02-51": {
+          "status": "alive",
+          "causes": null,
+          "killers": [],
+          "derivations": [
+            {
+              "sources": [
+                "log:B-02-51#9"
+              ],
+              "rule": "当日の身体計測と映像"
+            }
+          ]
+        },
+        "C-03-31": {
+          "status": "alive",
+          "causes": null,
+          "killers": [],
+          "derivations": [
+            {
+              "sources": [
+                "log:C-03-31#4"
+              ],
+              "rule": "当日の身体計測と映像"
+            }
+          ]
+        },
+        "A-04-23": {
+          "status": "dead",
+          "causes": [
+            "radiation"
+          ],
+          "killers": [],
+          "derivations": [
+            {
+              "cause": "radiation",
+              "k": null,
+              "sources": [
+                "log:B-02-51#5",
+                "log:A-04-23#3"
+              ],
+              "rule": "接触→検査→症状の経過→死亡"
+            }
+          ]
+        },
+        "B-05-11": {
+          "status": "dead",
+          "causes": [
+            "murder"
+          ],
+          "killers": [
+            "C-03-31"
+          ],
+          "derivations": [
+            {
+              "cause": "murder",
+              "k": "C-03-31",
+              "sources": [
+                "log:B-02-51#3",
+                "log:A-04-23#4",
+                "log:A-01-51#5",
+                "log:C-03-31#3",
+                "dialogue:#0",
+                "log:A-01-51#4"
+              ],
+              "rule": "故障認識＋専用鍵＋通電履歴＋安全を偽る発言＋身体の感電"
+            }
+          ]
+        },
+        "C-06-41": {
+          "status": "dead",
+          "causes": [
+            "radiation"
+          ],
+          "killers": [],
+          "derivations": [
+            {
+              "cause": "radiation",
+              "k": null,
+              "sources": [
+                "log:B-02-51#6",
+                "log:C-06-41#2"
+              ],
+              "rule": "接触→検査→症状の経過→死亡"
+            }
+          ]
+        },
+        "A-07-52": {
+          "status": "dead",
+          "causes": [
+            "radiation"
+          ],
+          "killers": [],
+          "derivations": [
+            {
+              "cause": "radiation",
+              "k": null,
+              "sources": [
+                "log:B-02-51#7",
+                "log:A-07-52#0"
+              ],
+              "rule": "接触→検査→症状の経過→死亡"
+            }
+          ]
+        },
+        "B-08-32": {
+          "status": "dead",
+          "causes": [
+            "radiation"
+          ],
+          "killers": [],
+          "derivations": [
+            {
+              "cause": "radiation",
+              "k": null,
+              "sources": [
+                "log:B-02-51#8",
+                "log:B-08-32#0"
+              ],
+              "rule": "接触→検査→症状の経過→死亡"
+            }
+          ]
+        }
+      },
+      "safety": [
+        "log:B-02-51#4",
+        "log:A-01-51#3",
+        "log:B-02-51#9",
+        "log:C-03-31#4",
+        "log:B-02-51#5",
+        "log:A-04-23#3",
+        "log:B-02-51#3",
+        "log:A-04-23#4",
+        "log:A-01-51#5",
+        "log:C-03-31#3",
+        "dialogue:#0",
+        "log:A-01-51#4",
+        "log:B-02-51#6",
+        "log:C-06-41#2",
+        "log:B-02-51#7",
+        "log:A-07-52#0",
+        "log:B-02-51#8",
+        "log:B-08-32#0",
+        "log:B-02-51#10"
+      ],
+      "contested": [
+        {
+          "claim": "dialogue:#2",
+          "rejectedBy": [
+            "log:C-06-41#3"
+          ],
+          "resolved": true,
+          "reason": "連続映像の所在が主張された現場と両立しない"
+        }
+      ],
+      "reinterpretations": [
+        {
+          "earlier": [
+            "e20"
+          ],
+          "unlock": "C-03-31",
+          "added": [
+            "e22",
+            "e26",
+            "e27"
+          ],
+          "before": "単なる故障事故か、意図した通電か",
+          "after": "専任者が故障を認識してから通電した。停止したという発言は安全の保証にならない",
+          "earlierSources": [
+            {
+              "doc": "dialogue",
+              "index": 0
+            }
+          ],
+          "addedSources": [
+            {
+              "doc": "log",
+              "owner": "C-03-31",
+              "index": 2
+            },
+            {
+              "doc": "log",
+              "owner": "C-03-31",
+              "index": 3
+            },
+            {
+              "doc": "log",
+              "owner": "A-04-23",
+              "index": 4
+            }
+          ]
+        },
+        {
+          "earlier": [
+            "e31"
+          ],
+          "unlock": "C-06-41",
+          "added": [
+            "e32",
+            "e27"
+          ],
+          "before": "輪郭を見た証言者は、この人の犯行に確信を持っている",
+          "after": "連続映像ではその人物は保安室から出ていない。確信した人違いを排除し、道具と操作の証拠へ戻って加害者を確定する",
+          "alternative": "道具の所持と操作主体の照合も別人を示す。本人の解読では、現場にいなかったという独立した所在の反証が開く。",
+          "earlierSources": [
+            {
+              "doc": "dialogue",
+              "index": 2
+            }
+          ],
+          "addedSources": [
+            {
+              "doc": "log",
+              "owner": "C-06-41",
+              "index": 3
+            },
+            {
+              "doc": "log",
+              "owner": "A-04-23",
+              "index": 4
+            }
+          ]
+        }
+      ]
+    },
+    "metrics": {
+      "logs": 41,
+      "characters": 2470,
+      "roles": {
+        "文化の比較": 2,
+        "身元の証拠": 12,
+        "接触と検査": 5,
+        "危機の前提": 1,
+        "権限の引き継ぎ": 1,
+        "最期の身体": 5,
+        "死亡の確認": 6,
+        "現在の生存": 2,
+        "現在の物資": 1,
+        "目的と選択": 1,
+        "故障への認識": 1,
+        "呼称と関係": 1,
+        "設備操作の観察": 1,
+        "弱い表現の正証言": 1,
+        "反証": 1
+      },
+      "evidenceByDocument": {
+        "dialogue:#0": 1,
+        "dialogue:#1": 1,
+        "dialogue:#2": 1,
+        "dialogue:#3": 1,
+        "dialogue:#4": 1,
+        "log:A-01-51#0": 1,
+        "log:A-01-51#1": 1,
+        "log:A-01-51#2": 1,
+        "log:A-01-51#3": 2,
+        "log:A-01-51#4": 1,
+        "log:A-01-51#5": 1,
+        "log:A-01-51#6": 2,
+        "log:B-02-51#0": 1,
+        "log:B-02-51#1": 2,
+        "log:B-02-51#2": 1,
+        "log:B-02-51#3": 1,
+        "log:B-02-51#4": 1,
+        "log:B-02-51#5": 1,
+        "log:B-02-51#6": 1,
+        "log:B-02-51#7": 1,
+        "log:B-02-51#8": 1,
+        "log:B-02-51#9": 1,
+        "log:B-02-51#10": 1,
+        "log:C-03-31#0": 2,
+        "log:C-03-31#1": 1,
+        "log:C-03-31#2": 1,
+        "log:C-03-31#3": 1,
+        "log:C-03-31#4": 1,
+        "log:A-04-23#0": 2,
+        "log:A-04-23#1": 1,
+        "log:A-04-23#2": 1,
+        "log:A-04-23#3": 2,
+        "log:A-04-23#4": 1,
+        "log:A-04-23#5": 1,
+        "log:A-04-23#6": 2,
+        "log:B-05-11#0": 2,
+        "log:B-05-11#1": 1,
+        "log:C-06-41#0": 2,
+        "log:C-06-41#1": 1,
+        "log:C-06-41#2": 2,
+        "log:C-06-41#3": 1,
+        "log:C-06-41#4": 2,
+        "log:A-07-52#0": 2,
+        "log:A-07-52#1": 2,
+        "log:B-08-32#0": 2,
+        "log:B-08-32#1": 2
+      },
+      "duplicates": 0,
+      "atmosphereOnly": 0,
+      "directNumbers": 1,
+      "killersInFinal": 0,
+      "multiSourceConclusions": 6,
+      "lengths": [
+        20,
+        31,
+        28,
+        137,
+        55,
+        110,
+        34,
+        20,
+        60,
+        31,
+        62,
+        59,
+        59,
+        59,
+        59,
+        59,
+        62,
+        49,
+        60,
+        32,
+        46,
+        61,
+        60,
+        59,
+        31,
+        38,
+        137,
+        107,
+        57,
+        34,
+        60,
+        32,
+        63,
+        29,
+        137,
+        57,
+        34,
+        137,
+        34,
+        137,
+        34
+      ]
+    },
+    "validation": {
+      "truth": true,
+      "evidence": true,
+      "text": true,
+      "llmSemantics": "自由な補筆の意味は決定的な検査の対象外。推論は限定文法の観察本文だけを使う。"
+    }
+  },
+  "mode": "実API",
+  "fixed": true,
+  "seed": 730
+}

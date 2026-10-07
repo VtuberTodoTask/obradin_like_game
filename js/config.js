@@ -3,7 +3,13 @@
   'use strict';
 
   A.CONFIG = {
-    version: '0.1-proto',
+    version: '2.1',
+    investigation: {
+      standardResidents: [8, 10], largeResidents: [12, 16], counselors: 2,
+      logTarget: [35, 55], entryLengthTarget: [60, 180], confirmGroup: 3,
+      defaultMode: 'standard', maxAttempts: 12,
+      actorSurvivalProbability: 0.55, emptyShelterProbability: 0.4,
+    },
 
     scale: {
       residents: [12, 16],

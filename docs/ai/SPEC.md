@@ -1,4 +1,61 @@
-# シェルター推理ゲーム 試作版 実装仕様（現状）
+# シェルター推理ゲーム v2.1 実装仕様（現状）
+
+- 更新日：2026-10-07
+- `meta.version = "2.1"`、`meta.generator = "incident-v2"` が現行形式。下に残した旧仕様・旧LLM実測は現行形式の保証ではない。
+
+## v2の実装入口
+
+読み込み順は `config → config.local → util → solver → tricks → narrator → culture → story → generator → evidence → semantics → inference → scenarios → investigation → llm → narration → game`。`ASARIYA.Generator.generate(seed, { fixed, size, mode, type })` がv2を生成する。固定版は `Generator.fixed()`、8人、専用乱数シード730。標準人数・大人数・確認人数・ログと字数の調整目標は `CONFIG.investigation`。警戒度は `CONFIG.alertMax`。
+
+`scenarios.js` は必要職能を先に確保して三つの因果型を組み立てる。設備、配給、身元型はシードの剰余で順に選ぶ。名前、トークン、支給印、道具番号、人数、補助危機、加害者の生死、侵入者の退場はシードで変化する。標準の相談役は必ず2人、区画は3、欠番なし。生存者は0〜2人。配給型は最後の相談役も亡くなった無人の例があり、壁面の医療端末と固定カメラで身体の停止を記録する。旧版の生存者確率は適用せず、型の条件内で `CONFIG.investigation` の確率を使う。
+
+## v2のデータ
+
+`story.incidents[]` の `actions` は `id / p / t / verb / place / preconditions / causes`、`consequences` は `p / t / status / cause / killer / causes` を持つ。死亡は結果から作る。`deaths[].action` は原因行動を参照する。
+
+各エントリは `t / timestamp / role / kind / text / facts / scene / deleted` を持つ。`facts[]` は本文の必須掲載契約で、出典 `loc` がある。`rendered` は旧LLM表示との連携用に残すが、本文検査の合格条件にしない。`writer` と `certainty` は推論に使わない。テンプレートは `evidence.js` の限定文法で生成・抽出する。採用したLLM全文には `semantic`（検証版・本文ハッシュ・契約ハッシュ・独立抽出・実在する引用・監査結果）が付く。内容か契約が変わったら無効になる。時刻は `D04 10:00` 表記で入力し、内部では分単位へ戻して比較する。
+
+各証拠の `semantic` は `evidence_id / predicate / args / subject / object / observer / source_kind / modality / polarity / qualifiers / time / interval / value / unit / required_precision / epistemic_scope / critical_fields` を保持する。型を限定し、一般的な自然言語推論器にはしない。受領・所在は肯定、複製・貸与・退出なしは個別qualifierの否定。文書・機械記録の内容を閲覧した記録はobserved、他者の発言の引用はreported、推測はinferred。
+
+主な観察は `HOME / MARKER / WORK / NUMBER / NEXT / PREVIOUS / LAST`、`KEY / SWITCH / ACK / SHOCK`、`GEAR / PUSH / FALL`、`KIT / INJECT / LIMIT / DOSE_SETTING / STOP`、`EXPOSE / TEST / TERMINAL / RATIONS / STARVE`、`CHIP / CARRIER / FEATURE / LIVE`。`CLAIM / OFFICIAL / WORDS` は主張された内容を保持し、そのまま客観的な制約にはしない。
+
+人物は一貫したトークンで表示し、ID解読時に全資料で名前へ置換する。最期の本人の感覚は `LAST_SENSE`。医療端末の停止記録 `PULSE_END` は `machineText / machineFacts` として自動付記に分離する。本文抽出と到達検査は両方を読む。機械情報を本人の知覚へ昇格しない。移植後の更新だけで死者を生存へ戻さない。
+
+## v2の推論と三種類の検証
+
+`Evidence.read(sc, known)` は初期資料と解読済み人物の未削除エントリだけを本文から読み戻す。人物参照は不透明な参照として扱い、未知の参照文字列からID要素を読むことはしない。公開された既知ID、コード表、番号範囲を使う。
+
+`Inference.identity` は文化の候補全単射とCSPでID要素を判定し、各一意候補を禁止して別解を調べる。操作の資格と専用道具の保持を照合する経路を含む。`simulateReach` は読める本文→事件の部分的結論→身元→追加資料という段を繰り返し、途中の結論・出典・解読経路も記録する。
+
+`Inference.derive` は型ごとの観察の組み合わせを照合し、身体の生死、死因の集合、加害者の集合を返す。必要観察がなければ別解を残す。動機や確信の語句で確定させない。誤認は連続映像の所在で検証できる。感染・被曝は接触と検査、症状・身体の死を組み合わせる。侵入者は一人の無認証通過という公開前提、ハッチ時刻と襲撃を照合する。
+
+`Verifier.verify` は①真相の時間・行動前提・因果・生死、②閲覧可能な本文だけからの到達と一意性、③本文から抽出した型・対象・時刻・数値・否定・前後関係の掲載契約との一致を分けて検査する。真相の住人属性・死亡・安全判定は最後の照合に使う。`trace` に身元・全員の結果・安全・再解釈の出典、`metrics` に件数・字数・直接番号・重複等を返す。
+
+テンプレートの限定文法とLLM全文の意味検証を区別する。LLM全文は期待値なしの抽出と独立監査が通った観察を、検証記録の本文・契約・版の一致を確認して読み戻す。これはLLMの読解を再利用する仕組みで、一般的な日本語の意味を決定的に保証するものではない。本人の感情や品質警告を事件の新証拠へ変えない。内部事実IDだけ残して本文を削る検査はFAIL。
+
+## v2の状態・UI
+
+`investigation.js` が認証、再接続、途中確定、保存復元を担当する。標準の拒否上限は `disconnected=true`、ハードだけ `over=true`。拒否済みIDは再接続後も保持。候補のIDは送信前に形式・公開された範囲を判定し、正しい要素を部分開示しない。認証されたトークンが選択人物と違うなら通知する。
+
+`drafts[token]` は仮名・ID要素候補・根拠参照、`answers.people[token]` は生死・死因・加害者候補。途中確定には対象と必要加害者の解読が条件で、正しい3人分を `confirmed` に保存して変更不可にする。下書きは推測として表示し、未知の属性を補完しない。
+
+ピン・比較参照は `dialogue#i / hatch#i / log:ID#i`。時系列・検索は読める本文の表示名・仮名・時刻だけを使い、未解読の件数・時刻・場面・書き手と削除本文を表示しない。保存キーは `asariya:v2:source:version:fixed-or-seed:size:mode:fingerprint`。人物と証拠の内容識別を含み、同シードでも別型のJSONや旧進行とは混ぜない。JSONは現行形式で検証に通ったものだけを読み込む。
+
+## v2のLLM・検証ツール
+
+本番v2.1は `narration.js` の全文生成→独立抽出→引用監査→型別照合→局所修正（既定2回）→同じ証拠のテンプレート復帰。旧コピー＋感情補筆の方式は廃止。人物・数値・否定・区間・情報源・主張の種類は厳密に比較し、自由文字列の同義表現だけ独立監査の実在する引用を条件に許可する。引用に数値・人物があることも検査する。抽出器は本文・公開規定・全証拠語彙・参照とヘッダーを受け取り、必須証拠一覧は比較と監査の段階で初めて渡す。一人称はプログラムの書き手参照へ戻し、移植後の隠された書き手IDを入力に足さない。LAST_SENSEの本人・現在時刻はヘッダーが保証し、他の過去の操作時刻は本文に必要。
+
+キャッシュ版は6、証拠版は `semantic-3`、プロンプト版は `whole-log-4`。形式・固定/シード・規模・生成/検証モデル・版・シナリオ内容でキーを分け、エントリ単位で契約・人物設定・公開規定・直前の本文・確定済み同場面資料の識別を検査する。時系列順で復元し、参照先の本文が変わった後続記事は既存キャッシュを再利用しない。再検査は保存した本文と元の別名対応を使い、生成APIは呼ばず抽出・監査だけを実行する。
+
+`tools/regression.test.js` は反例・隠れた属性の不使用・移植・重要な状態遷移を確認する。`tools/batch-check.js` は全シードの失敗と再試行を残し、件数・字数・直接番号・最終ログの加害者参照・複数資料を要する住人の結論の分布を出す。`tools/browser-check.js` は外部通信を遮断したChrome/Edgeの `file://` 操作検査。人間による推理の確認とは区別する。結果は [IMPLEMENTATION.md](IMPLEMENTATION.md)。
+
+検証器の「表示中のシナリオ：PASS」は復帰後を含む現在の本文の検査。「LLM文章化」の不合格・復帰件数は別に表示する。`LLM.diagnostics(sc)` が現在の採用・復帰・未処理と初回/最終採用の母数を集計する。エントリごとの実際の入力・出力・抽出・引用・対応表・期待値/実値・修正履歴を `narrationDiagnostic` に保存し、開発パネルとJSONで確認できる。認証情報は保存しない。
+
+不合格コードは `missing_required_evidence / changed_subject / changed_object / changed_value / changed_time / reversed_order / lost_negation / changed_source / changed_modality / unauthorized_event / unauthorized_trait / viewpoint_violation / reference_mapping_error / verification_uncertain`。長さ・文体は `quality_warning` で別集計。同じ指摘の反復を「仕様エラー」と断定しない。人による意味変更・誤検知の確定件数は未確認ならnull。実APIの範囲・全対象を含む指標と制約は [NARRATION.md](NARRATION.md)。
+
+---
+
+## 旧実装仕様 v0.2（以下は履歴・旧LLM実測を含む）
 
 - 版：v0.2-proto（HTML プロトタイプ。改修仕様 v0.2「人物設定とシェルター文化による読み解く手がかり」を反映）
 - 更新日：2026-10-07

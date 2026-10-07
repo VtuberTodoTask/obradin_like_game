@@ -70,5 +70,13 @@
 
   A.RNG = RNG;
   A.mixSeed = mixSeed;
-  A.util = { DAY, pad2, tAbs, dayOf, fmtT, range };
+  // 同シードの別型・別JSONを、進行と文章キャッシュへ重ねないための内容識別。
+  function scenarioFingerprint(sc) {
+    const text = JSON.stringify({ residents: sc.residents.map((r) => [r.id, r.token, r.name, r.profile]),
+      facts: sc.facts.map((f) => [f.type, f.args, f.loc]), initial: sc.initial_known_ids, rules: sc.publicCulture });
+    let hash = 2166136261;
+    for (let i = 0; i < text.length; i++) hash = Math.imul(hash ^ text.charCodeAt(i), 16777619);
+    return (hash >>> 0).toString(16);
+  }
+  A.util = { DAY, pad2, tAbs, dayOf, fmtT, range, scenarioFingerprint };
 })(window.ASARIYA = window.ASARIYA || {});

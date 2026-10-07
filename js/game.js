@@ -22,6 +22,8 @@
     alert: 0,
     tried: [],
     memos: {},
+    drafts: {}, pins: [], comparison: [], confirmed: {}, filters: { text: '', day: '' },
+    disconnected: false, reconnections: 0,
     answers: { people: {}, verdict: { result: '', reasons: [] } },
     result: null,
     over: false,
@@ -40,7 +42,7 @@
   function boot() {
     const params = new URLSearchParams(location.search);
     const seed = Number(params.get('seed'));
-    startSeed(Number.isFinite(seed) && seed > 0 ? seed : randomSeed());
+    startSeed(params.get('scenario') === 'fixed' ? 730 : Number.isFinite(seed) && seed > 0 ? seed : randomSeed());
     bindStatic();
   }
 
@@ -49,7 +51,9 @@
   function startSeed(seed) {
     let gen;
     try {
-      gen = A.Generator.generate(seed);
+      const params = new URLSearchParams(location.search);
+      gen = A.Generator.generate(seed, { fixed: params.get('scenario') === 'fixed',
+        size: params.get('size') === 'large' ? 'large' : 'standard', mode: params.get('mode') === 'hard' ? 'hard' : 'standard' });
     } catch (e) {
       alert(e.message);
       return;
@@ -57,7 +61,8 @@
     S.source = 'gen';
     setScenario(gen.scenario, gen.report);
     try {
-      history.replaceState(null, '', `?seed=${seed}`);
+      const params = new URLSearchParams(location.search); params.set('seed', seed);
+      history.replaceState(null, '', `?${params}`);
     } catch (e) {
       /* file:// では失敗することがある */
     }
@@ -144,7 +149,7 @@
           if (S.sc !== sc) return;
           last = p;
           $('#llmBar').style.width = `${p.totalEntries ? Math.round((100 * p.doneEntries) / p.totalEntries) : 100}%`;
-          $('#llmStatus').textContent = `時系列の波 ${p.doneWaves}/${p.totalWaves} ・ エントリ ${p.doneEntries}/${p.totalEntries}`;
+          $('#llmStatus').textContent = `全文の生成・検証 ${p.doneEntries}/${p.totalEntries} 件`;
           showActivity();
         },
       });
@@ -155,7 +160,7 @@
         `LLM 文章化：${rep.llm}/${rep.entries} エントリ${rep.unresolved.length ? `・検証に通らない ${rep.unresolved.length} 件` : ''}・矛盾の指摘 ${rep.contradictions} 件・API ${rep.stats.calls} 回`,
       );
       if (rep.specErrors.length) {
-        term('warn', `仕様エラー ${rep.specErrors.length} 件（同じ種類の指摘が続いた／場面カードが正本と矛盾）はテンプレート文で確定した。内訳は検証器パネル`);
+        term('warn', `LLM文章化：検証不合格 ${rep.specErrors.length} 件をテンプレートへ戻した。シナリオの検証結果とは別。詳細は検証器の「LLM検証の指摘」。`);
       }
       return rep.unresolved.length ? { kind: 'unresolved', rep } : { kind: 'done', rep };
     } catch (e) {
@@ -216,6 +221,8 @@
     S.alert = 0;
     S.tried = [];
     S.memos = {};
+    S.drafts = {}; S.pins = []; S.comparison = []; S.confirmed = {};
+    S.filters = { text: '', day: '' }; S.disconnected = false; S.reconnections = 0;
     S.answers = { people: {}, verdict: { result: '', reasons: [] } };
     S.result = null;
     S.over = false;
@@ -223,16 +230,13 @@
     S.selTok = null;
   }
 
-  const storageKey = () => `asariya:v1:${S.source}:${S.sc.meta.seed}`;
+  const storageKey = () => `asariya:v2:${S.source}:${S.sc.meta.version}:${S.sc.meta.fixed ? 'fixed' : S.sc.meta.seed}:${S.sc.meta.size}:${S.sc.meta.mode}:${A.util.scenarioFingerprint(S.sc)}`;
 
   function saveProgress() {
     try {
       localStorage.setItem(
         storageKey(),
-        JSON.stringify({
-          unlockOrder: S.unlockOrder, alert: S.alert, tried: S.tried, memos: S.memos,
-          answers: S.answers, result: S.result, over: S.over, termLog: S.termLog.slice(0, 30),
-        }),
+        JSON.stringify(A.Investigation.serialize(S)),
       );
     } catch (e) {
       /* 保存できない環境では何もしない */
@@ -247,19 +251,7 @@
       data = null;
     }
     if (!data) return;
-    (data.unlockOrder || []).forEach((id) => {
-      if (S.byId.has(id)) {
-        S.unlocked.add(id);
-        S.unlockOrder.push(id);
-      }
-    });
-    S.alert = data.alert || 0;
-    S.tried = data.tried || [];
-    S.memos = data.memos || {};
-    S.answers = data.answers || S.answers;
-    S.result = data.result || null;
-    S.over = !!data.over;
-    S.termLog = data.termLog || [];
+    A.Investigation.restore(S, S.sc, data);
   }
 
   // ------------------------------------------------------------------ 表示の部品
@@ -270,10 +262,11 @@
     const sel = S.selTok === r.token ? ' sel' : '';
     const rev = S.justRevealed === r.token ? ' reveal' : '';
     if (S.unlocked.has(id)) return `<span class="tok known${sel}${rev}" data-tok="${r.token}" title="${r.id}">${esc(r.name)}</span>`;
-    return `<span class="tok masked${sel}" data-tok="${r.token}" title="未解読の人物">⟨${r.token}⟩</span>`;
+    const nickname = S.drafts[r.token]?.nickname;
+    return `<span class="tok masked${sel}" data-tok="${r.token}" title="未解読の人物">${nickname ? esc(nickname) + ' ' : ''}⟨${r.token}⟩</span>`;
   }
   const rich = (text) => esc(text).replace(TOKEN_RE, (m, id) => personHTML(id));
-  const labelOf = (r) => (S.unlocked.has(r.id) ? `${r.name}（${r.id}）` : `⟨${r.token}⟩`);
+  const labelOf = (r) => (S.unlocked.has(r.id) ? `${r.name}（${r.id}）` : `${S.drafts[r.token]?.nickname || ''}⟨${r.token}⟩`);
   const jobLabel = (code) => `${code} ${CFG.jobByCode[code].name}`;
   const lastEntry = (id) => {
     const es = S.sc.documents.chip_logs[id] || [];
@@ -319,6 +312,7 @@
     if (key === 'jobs') return '職能コード表';
     if (key === 'hatch') return '外部ハッチ開閉記録';
     if (key === 'dialogue') return '相談役と管理AIの会話ログ';
+    if (key === 'timeline') return '時系列・資料比較';
     if (key.startsWith('log:')) {
       const r = S.byId.get(key.slice(4));
       return `主観ログ：${r.name}`;
@@ -350,13 +344,14 @@
     $('#narrInfo').innerHTML = cnt.llm
       ? `文章 <span class="llm">LLM ${cnt.llm}/${cnt.total}</span>`
       : `文章 テンプレート${configured ? '' : '（API キー未設定）'}`;
+    if (cnt.template) $('#narrInfo').innerHTML += ` ／ <span class="fallback">検証不合格・復帰 ${cnt.template}件</span>`;
     $('#btnLLM').hidden = !configured || cnt.pending === 0 || !!S.llmRun;
   }
 
   function renderDocList() {
     const sc = S.sc;
     const now = sc.shelter.now_day;
-    const base = ['brief', 'overview', 'jobs', 'hatch', 'dialogue'];
+    const base = ['brief', 'overview', 'jobs', 'hatch', 'dialogue', 'timeline'];
     const btn = (key, label, meta, extra = '') =>
       `<button class="doc${S.current === key ? ' active' : ''}${extra}" data-doc="${key}">${label}${meta ? `<span class="meta">${meta}</span>` : ''}</button>`;
     let html = `<div class="doc-group"><h3>資料</h3>${base.map((k) => btn(k, docTitle(k))).join('')}</div>`;
@@ -381,6 +376,7 @@
     else if (key === 'jobs') html = viewJobs();
     else if (key === 'hatch') html = viewHatch();
     else if (key === 'dialogue') html = viewDialogue();
+    else if (key === 'timeline') html = viewTimeline();
     else html = viewLog(key.slice(4));
     $('#viewer').innerHTML = html;
   }
@@ -400,18 +396,18 @@
       </ol>
       <h3>ID と伏せ字</h3>
       <p>住人の ID は <code>区画-入居順-職能コード</code>（例 <code>C-07-31</code>）。管理AIはログの人名を ID に置き換えて保存しているため、解読していない人物は <span class="tok masked">⟨x9Kq⟩</span> のような<b>伏せ字</b>で表示される。同じ伏せ字は常に同じ人物を指す。</p>
-      <p>右の「ID 認証」に正しい ID を入力すると、その人物の<b>主観ログ</b>が開き、全資料の伏せ字が名前に置き換わる。誤った ID を送ると<b>警戒度</b>が上がり、${CFG.alertMax} に達すると接続を遮断される。正しい ID を入力するたびに、警戒度は ${CFG.alertRecoverOnSuccess} 下がる。</p>
+      <p>右の「ID 認証」に正しい ID を入力すると、その人物の<b>主観ログ</b>が開き、全資料の伏せ字が名前に置き換わる。認証はその ID の存在を確かめるもので、選択人物との対応は別に確認する。誤った ID は警戒度を上げる。${S.sc.meta.mode === 'hard' ? 'ハードモードでは上限で接続を遮断し、真相を開示する。' : '上限では認証だけを一時停止する。資料とメモは残り、「再接続」ですぐ再開できる。'}同じ拒否済み ID と形式エラーには追加加算しない。</p>
       <ul>
         <li><b>区画</b>：住んでいる区画。</li>
-        <li><b>入居順</b>：シェルター全体での通し番号。欠番がありうる。同じ番号の住人は二人といない。</li>
+        <li><b>入居順</b>：シェルター全体での通し番号。受付の記録は連続し、欠番はない。同じ番号の住人は二人といない。</li>
         <li><b>職能</b>：仕事の内容から読み取る。対応は「職能コード表」を参照。</li>
       </ul>
-      <p>主観ログには、誰がどの区画の住人か、何番目に来たかは書かれていない。手がかりは、人々の身なりや匂い、言葉づかい、並び方や呼び方といった<b>このシェルターの暮らしぶり</b>の中にある。素性の分かった住人の描写と見比べて、このシェルターならではの決まりごとを見つけ出してほしい。決まりごとはシェルターごとに違う。</p>
+      <p>身なりの支給規則、入居の前後、専任資格、道具の受領と操作を照合して身元を調べる。素性が分かった人の記録を開くと、既読の発言の意味が変わる場合がある。番号が見える例も入口として少数残されている。</p>
       <ul>
       </ul>
       <h3>資料の性質</h3>
       <ul>
-        <li><b>主観ログ</b>は本人の感覚と感情の記録で、嘘はつけない。ただし暗闇や混乱の中での<b>思い込み・見間違い</b>はありうる。死者のログの最後のエントリは、死の直前の感覚だ。</li>
+        <li><b>主観ログ</b>には感覚、考え、他人の発言が混じる。暗さや距離、他資料との一致を調べる。確信している証言が誤り、不確かな証言が正しい場合もある。身体の死と、チップの最終更新は区別する。</li>
         <li><b>生存者のログは現在まで更新され続けている</b>。最終更新の時刻に注意。</li>
         <li>相談役と管理AIの会話や、管理AIに登録された<b>公式記録は改ざん・偽装されうる</b>。</li>
         <li>チップは住人の脳内にあるが、取り出して別人に移すこともできるという噂がある。一人称や口癖などの<b>語り口</b>は人によって違う。</li>
@@ -430,7 +426,9 @@
       <h3>操作</h3>
       <ul>
         <li>伏せ字や名前をクリックすると、同じ人物がすべて強調され、右の人物索引にメモと出現箇所が表示される。</li>
-        <li>進行状況とメモはこのブラウザに自動保存される。</li>
+        <li>人物の仮の名前・身元候補・回答の下書き・根拠を保存できる。各記録の「ピン留め」で時系列と2件の資料比較へ送れる。</li>
+        <li>標準モードでは「最終回答」の途中確認で、正しい回答が${CFG.investigation.confirmGroup}人分そろうとまとめて確定する。項目ごとの正誤は表示しない。</li>
+        <li>進行状況と調査メモはこのブラウザに自動保存される。</li>
       </ul>
     </div>`;
   }
@@ -449,7 +447,8 @@
         <tr><th>相談役</th><td>${o.counselors.map((id) => `${personHTML(id)} <span class="mono muted">${id}</span>`).join('<br>')}</td></tr>
         <tr><th>記録期間</th><td>D01 〜 D${String(o.now_day).padStart(2, '0')}（現在）</td></tr>
       </table>
-      <p class="muted">相談役の ID は管理AIの公開情報として最初から判明している。ここが推理の入口になる。</p>`;
+      <p class="muted">相談役の ID は管理AIの公開情報として最初から判明している。ここが推理の入口になる。</p>
+      <h3>支給品と受付の規定</h3><p>${esc(sc.publicCulture.text)}</p>`;
   }
 
   function viewJobs() {
@@ -464,11 +463,12 @@
       .map(
         (h, i) =>
           `<tr data-entry="${i}"><td class="num">${h.timestamp}</td><td>${h.side === 'inside' ? '内側から開放' : '外側から開放'}</td>` +
-          `<td>${h.auth ? personHTML(h.auth) : '<span class="bad">なし（強制開放）</span>'}</td></tr>`,
+          `<td>${h.auth ? personHTML(h.auth) : '<span class="bad">なし（強制開放）</span>'}${pinButton('hatch', i)}</td></tr>`,
       )
       .join('');
     return `<h1 class="doc-title">外部ハッチ開閉記録</h1>
       <p class="doc-sub">管理AIが自動記録 ・ 認証にはチップを使う</p>
+      <p>出入口はこのハッチだけ。認証なしの開放一回で一人だけ通る。外側からなら入場、内側からなら退場。住人のチップ認証による通過とは区別する。</p>
       ${rows ? `<table class="data"><tr><th>時刻</th><th>操作</th><th>認証</th></tr>${rows}</table>` : '<p class="muted">記録期間中の開閉はない。</p>'}`;
   }
 
@@ -481,7 +481,7 @@
             return `<div class="dlg-line${ai ? ' ai' : ''}"><span class="who">${ai ? '管理AI' : personHTML(l.speaker)}</span><span>${rich(l.text)}</span></div>`;
           })
           .join('');
-        return `<div class="entry" data-entry="${i}"><div class="entry-head">${e.timestamp}</div><div class="entry-text">${lines}</div></div>`;
+        return `<div class="entry" data-entry="${i}"><div class="entry-head">${e.timestamp}${pinButton('dialogue', i)}</div><div class="entry-text">${lines}</div></div>`;
       })
       .join('');
     return `<h1 class="doc-title">相談役と管理AIの会話ログ</h1><p class="doc-sub">相談役だけが管理AIと対話できる</p>${es}`;
@@ -497,7 +497,7 @@
           return `<div class="entry deleted" data-entry="${i}"><div class="entry-head">${e.timestamp}</div><div class="entry-text">▓▓▓ この記録は削除されています ▓▓▓</div></div>`;
         }
         const emo = e.emotion ? `<span class="emo ${e.emotion}">${CFG.emotions[e.emotion] || e.emotion}</span>` : '';
-        return `<div class="entry" data-entry="${i}"><div class="entry-head">${e.timestamp}${emo}</div><div class="entry-text">${rich(e.text)}</div></div>`;
+        return `<div class="entry" data-entry="${i}"><div class="entry-head">${e.timestamp}${emo}${pinButton('log:' + id, i)}</div><div class="entry-text">${rich(e.text)}</div>${e.machineText ? `<div class="machine-record"><b>医療端末の自動付記</b><div class="entry-text">${rich(e.machineText)}</div></div>` : ''}</div>`;
       })
       .join('');
     return `<h1 class="doc-title">${personHTML(id)} の主観ログ</h1>
@@ -510,7 +510,8 @@
       .slice(0, 8)
       .map((m) => `<li class="${m.kind}">${esc(m.text)}</li>`)
       .join('');
-    $('#idInput').disabled = S.over;
+    $('#idInput').disabled = S.over || S.disconnected;
+    $('#btnReconnect').hidden = !S.disconnected || S.over;
   }
 
   function renderPeople() {
@@ -538,15 +539,77 @@
     const list = (occ.get(S.selTok) || [])
       .map((o) => `<li data-doc="${o.doc}" data-idx="${o.idx}"><span class="when">${esc(o.when)}</span>${esc(docTitle(o.doc))}</li>`)
       .join('');
+    const draft = S.drafts[S.selTok] || {};
+    const answer = S.answers.people[S.selTok] || {};
+    const fields = [['nickname', '仮の名前'], ['district', '区画候補'], ['order', '入居順候補'], ['job', '職能候補']]
+      .map(([key, label]) => `<label>${label}<input data-draft="${key}" value="${esc(draft[key] || '')}" maxlength="60" placeholder="自分の推測"></label>`).join('');
+    const opts = (map, value) => `<option value="">未記入</option>` + Object.entries(map).map(([v, label]) => `<option value="${esc(v)}"${v === value ? ' selected' : ''}>${esc(label)}</option>`).join('');
+    const killers = Object.fromEntries([...occ.keys()].map((tok) => [tok, labelOf(S.byTok.get(tok))]));
+    const refs = (draft.evidence || []).map((r) => {
+      const item = visibleEntries().find((e) => e.ref === r);
+      return item ? `<li><button class="btn ghost" data-jump="${esc(r)}">${esc(item.timestamp)} ${esc(docTitle(item.doc))}</button></li>` : '';
+    }).join('');
     $('#tokDetail').innerHTML = `
       <div class="head"><b>${personHTML(sel.id)}</b><span class="id">${S.unlocked.has(sel.id) ? sel.id : '未解読'}</span></div>
+      <div class="hypotheses">${fields}
+        <label>生死候補<select data-hypothesis="status"${S.confirmed[S.selTok] ? ' disabled' : ''}>${opts({ alive: '生存', dead: '死亡' }, answer.status)}</select></label>
+        <label>死因候補<select data-hypothesis="cause"${S.confirmed[S.selTok] ? ' disabled' : ''}>${opts(CFG.causes, answer.cause)}</select></label>
+        <label>加害者候補<select data-hypothesis="killer"${S.confirmed[S.selTok] ? ' disabled' : ''}>${opts(killers, answer.killer)}</select></label>
+      </div><p class="hint">候補は自分の推測。生死・死因・加害者の下書きは最終回答と共通。</p>
       <textarea id="memo" placeholder="推理メモ（区画・入居順・職能の候補など）">${esc(S.memos[S.selTok] || '')}</textarea>
+      <h4>保存した根拠</h4><ul>${refs || '<li>各記録の「この人物の根拠へ」で紐付ける。</li>'}</ul>
       <ul class="occ">${list || '<li>閲覧中の資料には出てこない</li>'}</ul>`;
+  }
+
+  // 時系列・比較はこの一覧だけを使う。未解読資料の件数・時刻・writer・場面名を読まない。
+  function visibleEntries() {
+    const out = [];
+    const add = (doc, es) => es.forEach((e, i) => {
+      if (e.deleted) return;
+      const text = doc === 'dialogue' ? e.lines.map((l) => `${l.speaker === 'AI' ? '管理AI' : labelOf(S.byId.get(l.speaker))}：${l.text}`).join('\n') : e.text + (e.machineText ? `\n【医療端末の自動付記】${e.machineText}` : '');
+      const visibleText = text.replace(TOKEN_RE, (_, id) => {
+        const r = S.byId.get(id);
+        return r ? `${labelOf(r)} ${S.drafts[r.token]?.nickname || ''}` : '未登録の人物';
+      });
+      out.push({ ref: `${doc}#${i}`, doc, index: i, t: e.t, timestamp: e.timestamp, text, visibleText });
+    });
+    add('dialogue', S.sc.documents.counselor_dialogues);
+    add('hatch', S.sc.documents.hatch_log);
+    for (const id of S.unlocked) add(`log:${id}`, S.sc.documents.chip_logs[id] || []);
+    return out.sort((a, b) => a.t - b.t);
+  }
+  function pinButton(doc, i) {
+    const ref = `${doc}#${i}`;
+    return `<span class="entry-actions"><button class="btn ghost" data-pin="${esc(ref)}">${S.pins.includes(ref) ? 'ピン解除' : 'ピン留め'}</button>${S.selTok ? `<button class="btn ghost" data-evidence="${esc(ref)}">この人物の根拠へ</button>` : ''}</span>`;
+  }
+  function viewTimeline() {
+    const entries = visibleEntries();
+    const search = (S.filters.text || '').trim().toLocaleLowerCase();
+    const filtered = entries.filter((e) => (!search || e.visibleText.toLocaleLowerCase().includes(search)) && (!S.filters.day || UDay(e.t) === Number(S.filters.day)));
+    const pinned = entries.filter((e) => S.pins.includes(e.ref));
+    const card = (e) => `<article class="entry"><div class="entry-head">${esc(e.timestamp)}${pinButton(e.doc, e.index)}</div>
+      <button class="btn ghost" data-jump="${esc(e.ref)}">${esc(docTitle(e.doc))}へ戻る</button><div class="entry-text">${rich(e.text)}</div></article>`;
+    const selected = S.comparison.map((ref) => pinned.find((e) => e.ref === ref)).filter(Boolean).slice(0, 2);
+    const options = '<option value="">資料を選ぶ</option>' + pinned.map((e) => `<option value="${esc(e.ref)}">${esc(e.timestamp + ' ' + docTitle(e.doc))}</option>`).join('');
+    const selector = (i) => `<select data-compare="${i}">${options.replace(`value="${esc(S.comparison[i] || '')}"`, `value="${esc(S.comparison[i] || '')}" selected`)}</select>`;
+    return `<h1 class="doc-title">時系列・資料比較</h1><p>閲覧できる資料だけを表示。仮の名前や人物の伏せ字でも検索できる。</p>
+      <div class="timeline-filters"><label>人物・仮の名前・文章<input id="timelineText" value="${esc(S.filters.text)}" placeholder="表示中の文章を検索"></label>
+        <label>日付<input id="timelineDay" type="number" min="1" value="${esc(S.filters.day)}" placeholder="全日"></label><button class="btn" id="btnFilter">絞り込む</button></div>
+      <h3>ピン留めした2件を比較</h3><div class="compare-select">${selector(0)}${selector(1)}</div>
+      <div class="comparison">${selected.map(card).join('') || '<p class="hint">各資料のピン留めから比較する記録を選ぶ。</p>'}</div>
+      <details><summary>ピン留め一覧（${pinned.length}件）</summary>${pinned.map(card).join('')}</details>
+      <h3>閲覧できる時系列（${filtered.length}件）</h3>${filtered.map(card).join('')}`;
+  }
+  const UDay = (t) => A.util.dayOf(t);
+  function jumpTo(ref) {
+    const item = visibleEntries().find((e) => e.ref === ref);
+    if (item) openDoc(item.doc, item.index);
   }
 
   // ------------------------------------------------------------------ 操作
 
   function openDoc(key, idx) {
+    if (key.startsWith('log:') && !S.unlocked.has(key.slice(4))) return;
     S.current = key;
     renderDocList();
     renderViewer();
@@ -567,59 +630,26 @@
   }
 
   function normalizeId(raw) {
-    const s = raw.normalize('NFKC').trim().toUpperCase();
-    const m = s.match(/^([A-Z])\s*[-ー−‐_ ]?\s*(\d{1,2})\s*[-ー−‐_ ]?\s*(\d{2})$/);
-    return m ? `${m[1]}-${m[2].padStart(2, '0')}-${m[3]}` : null;
+    return A.Investigation.normalizeId(raw);
   }
 
   function tryUnlock(raw) {
-    if (S.over) return;
-    const sc = S.sc;
-    const id = normalizeId(raw);
+    const result = A.Investigation.authenticate(S, S.sc, raw);
     S.justRevealed = null;
-    if (!id) {
-      term('warn', '形式エラー：区画-入居順-職能 の形で入力（例 C-07-31）');
-    } else if (S.unlocked.has(id)) {
-      term('info', `${id} は解読済み`);
-      openDoc(`log:${id}`);
-    } else {
-      const [d, e, j] = id.split('-');
-      const n = Number(e);
-      if (!sc.shelter.districts.includes(d) || n < 1 || n > sc.shelter.max_entry || !CFG.jobByCode[Number(j)]) {
-        term('warn', `${id}：存在しない区画・入居番号・職能コードを含む（送信していない）`);
-      } else if (S.byId.has(id)) {
-        const r = S.byId.get(id);
-        S.unlocked.add(id);
-        S.unlockOrder.push(id);
-        S.justRevealed = r.token;
-        if (S.selTok === r.token) S.selTok = r.token;
-        term('ok', `認証成功：${id} の主観ログを取得。伏せ字 ⟨${r.token}⟩ を解除 → ${r.name}`);
-        // 正しい ID のたびに警戒度を下げる（改修仕様 v0.2 §9）。推理が進んでいる間は試行の余地が回復する
-        if (S.alert > 0) {
-          S.alert = Math.max(0, S.alert - (CFG.alertRecoverOnSuccess || 0));
-          term('info', `警戒度が下がった：${S.alert}/${CFG.alertMax}`);
-        }
-        S.current = `log:${id}`;
-      } else if (S.tried.includes(id)) {
-        term('warn', `${id} は拒否済みの ID（警戒度は変わらない）`);
-      } else {
-        S.tried.push(id);
-        S.alert++;
-        term('err', `認証失敗：${id} に該当する記録なし。警戒度 ${S.alert}/${CFG.alertMax}`);
-        if (S.alert >= CFG.alertMax) {
-          S.over = true;
-          term('err', '侵入検知。管理AIとの接続が遮断された。');
-        }
-      }
-    }
-    saveProgress();
-    renderAll();
-    if (S.justRevealed) {
-      const tok = S.justRevealed;
-      setTimeout(() => {
-        if (S.justRevealed === tok) S.justRevealed = null;
-      }, 2000);
-    }
+    if (result.kind === 'success') {
+      const r = S.byId.get(result.id);
+      S.justRevealed = r.token;
+      term('ok', `認証成功：${result.id} → ${r.name}（⟨${r.token}⟩）`);
+      if (result.mismatch) term('warn', '認証されたのは選択中の人物とは別のトークン。人物の下書きとの対応を見直してください。');
+      S.current = `log:${result.id}`;
+    } else if (result.kind === 'known') {
+      term('info', `${result.id} は解読済み`); S.current = `log:${result.id}`;
+    } else if (result.kind === 'format') term('warn', '形式または公開された区画・番号範囲・職能コードに合わないため送信していない。');
+    else if (result.kind === 'repeated') term('warn', '拒否済みの ID。警戒度は変わらない。');
+    else if (result.kind === 'rejected') term('err', `認証失敗：${result.id}。警戒度 ${S.alert}/${CFG.alertMax}`);
+    else if (result.kind === 'disconnected') term('warn', '認証を再開するには再接続してください。');
+    if (S.disconnected) term('info', '認証を一時停止。資料とメモは保持。「再接続」で再開できる。');
+    saveProgress(); renderAll();
     if (S.over && !S.result) showResult();
   }
 
@@ -627,6 +657,12 @@
     S.selTok = S.selTok === tok ? null : tok;
     $$('.tok').forEach((el) => el.classList.toggle('sel', !!S.selTok && el.dataset.tok === S.selTok));
     renderPeople();
+    if (S.selTok) {
+      const draft = S.drafts[S.selTok] || {};
+      if (draft.district && draft.order && draft.job) $('#idInput').value = `${draft.district}-${draft.order}-${draft.job}`;
+      else $('#idInput').value = '';
+    }
+    saveProgress();
   }
 
   // ------------------------------------------------------------------ 最終回答
@@ -649,11 +685,12 @@
       .map((r) => {
         const a = S.answers.people[r.token] || {};
         const causeOpts = opt('', '—', a.cause) + Object.entries(CFG.causes).map(([k, v]) => opt(k, v, a.cause)).join('');
-        return `<tr data-tok="${r.token}">
+        const fixed = S.confirmed[r.token] ? ' disabled' : '';
+        return `<tr data-tok="${r.token}"${fixed ? ' class="confirmed"' : ''}>
           <td>${personHTML(r.id)}${S.unlocked.has(r.id) ? ` <span class="mono muted">${r.id}</span>` : ''}</td>
-          <td><select data-f="status">${opt('', '—', a.status)}${opt('alive', '生存', a.status)}${opt('dead', '死亡', a.status)}</select></td>
-          <td><select data-f="cause"${a.status === 'dead' ? '' : ' disabled'}>${causeOpts}</select></td>
-          <td><select data-f="killer"${a.status === 'dead' && a.cause === 'murder' ? '' : ' disabled'}>${killerOpts(a.killer)}</select></td>
+          <td><select data-f="status"${fixed}>${opt('', '—', a.status)}${opt('alive', '生存', a.status)}${opt('dead', '死亡', a.status)}</select>${fixed ? '確定' : ''}</td>
+          <td><select data-f="cause"${fixed || (a.status === 'dead' ? '' : ' disabled')}>${causeOpts}</select></td>
+          <td><select data-f="killer"${fixed || (a.status === 'dead' && a.cause === 'murder' ? '' : ' disabled')}>${killerOpts(a.killer)}</select></td>
         </tr>`;
       })
       .join('');
@@ -665,12 +702,15 @@
       .map((x) => `<label><input type="checkbox" name="reason" value="${x}"${v.reasons.includes(x) ? ' checked' : ''}${v.result === 'danger' ? '' : ' disabled'}> ${x}</label>`)
       .join('');
     $('#verdictBox').innerHTML = `<legend>安全判定</legend>${radio('safe', '安全')}${radio('danger', '危険')}${radio('worthless', '価値なし')}<div class="reasons">危険の理由：${reasons}</div>`;
-    $('#answerDlg').showModal();
+    $('#btnConfirm').hidden = S.sc.meta.mode === 'hard';
+    $('#btnConfirm').textContent = `${CFG.investigation.confirmGroup}人まとめて途中確認`;
+    if (!$('#answerDlg').open) $('#answerDlg').showModal();
   }
 
   function onAnswerChange(e) {
     const tr = e.target.closest('tr[data-tok]');
     if (tr) {
+      if (S.confirmed[tr.dataset.tok]) return;
       const a = (S.answers.people[tr.dataset.tok] = S.answers.people[tr.dataset.tok] || {});
       a[e.target.dataset.f] = e.target.value;
       const cause = $('select[data-f="cause"]', tr);
@@ -684,6 +724,12 @@
       S.answers.verdict.reasons = $$('input[name="reason"]:checked').map((cb) => cb.value);
     }
     saveProgress();
+  }
+
+  function confirmAnswers() {
+    const group = A.Investigation.confirmBatch(S, S.sc);
+    $('#confirmStatus').textContent = group.length ? `${group.length}人分の回答が確定した。` : '今回はまとまった確定なし。';
+    saveProgress(); openAnswer(); renderPeople();
   }
 
   function submitAnswer() {
@@ -789,6 +835,7 @@
     $('#resultBody').innerHTML = `${head}
       <p>安全判定の真相：<b>${verdictLabel(sc.current_state.verdict)}</b>${res ? ` ／ あなたの回答：${verdictLabel(S.answers.verdict)} ${mark(res.verdict)}` : ''}</p>
       <p class="muted">危機：${esc(CFG.crises[sc.shelter.crisis].label)} ／ 物資：${{ depleted: '枯渇', low: '残りわずか', sufficient: '十分' }[sc.shelter.supplies]}</p>
+      <p class="muted">再接続 ${S.reconnections}回 ／ 途中確定 ${Object.keys(S.confirmed).length}人</p>
       <h3 style="margin:14px 0 4px">トリック</h3>${tricks}
       <details${res ? '' : ' open'}><summary>住人の真相</summary>
         <div class="table-wrap" style="padding:0"><table class="answer-table">
@@ -802,25 +849,36 @@
 
   function openDev() {
     const sc = S.sc;
-    const rep = S.report;
+    const rep = S.report = A.Verifier.verify(sc);
+    const narration = A.LLM.diagnostics(sc);
     const steps = rep.reach.steps
-      .map((s, i) => `<li>第${i + 1}段：${s.length}人 <span class="mono muted">${s.join(' ')}</span></li>`)
+      .map((s, i) => `<tr><td>第${i + 1}段</td><td>${s.length}人</td><td>${s.map((id) => `${esc(S.byId.get(id)?.name || '名前不明')} <span class="mono">${esc(id)}</span>`).join(' ／ ')}</td></tr>`)
       .join('');
     $('#devBody').innerHTML = `
       <div class="dev-section"><h3>シナリオ生成</h3>
         <div class="dev-row">シード <input type="number" id="devSeed" value="${esc(sc.meta.seed)}" style="width:9em">
           <button class="btn primary" id="devGen">生成して遊ぶ</button>
           <button class="btn" id="devRand">ランダム</button>
+          <button class="btn" id="devFixed">固定シナリオ「灯台」</button>
+          <select id="devSize"><option value="standard">8〜10人</option><option value="large"${sc.meta.size === 'large' ? ' selected' : ''}>12〜16人</option></select>
+          <select id="devMode"><option value="standard">標準モード</option><option value="hard"${sc.meta.mode === 'hard' ? ' selected' : ''}>ハードモード</option></select>
           <button class="btn" id="devExport">JSON 出力</button>
           <label class="btn">JSON 読込<input type="file" id="devImport" accept=".json,application/json" hidden></label>
         </div>
       </div>
       <div class="dev-section"><h3>現在のシナリオの検証レポート</h3>
-        <p>${rep.pass ? '<b class="good">PASS</b>' : '<b class="bad">FAIL</b>'} ・ 生成試行 ${sc.meta.attempts || '—'} 回 ・
+        <p>表示中のシナリオ：${rep.pass ? '<b class="good">PASS</b>' : '<b class="bad">FAIL</b>'} ・ 生成試行 ${sc.meta.attempts || '—'} 回 ・
           住人 ${sc.residents.length} ・ 区画 ${sc.shelter.districts.length} ・ 死者 ${sc.deaths.length} ・ 手がかり事実 ${sc.facts.length} 件</p>
+        <p class="muted">この結果は現在の本文から事件を解けるかの検査。LLMが不合格でも、検証済みのテンプレートへ戻した後の本文はPASSになる。</p>
+        <p id="devLLMSummary">LLM文章化：<b class="${narration.counts.template ? 'bad' : narration.status === 'PASS' ? 'good' : 'muted'}">${esc(narration.status)}</b>
+          ・ LLM採用 ${narration.counts.llm}/${narration.counts.total}件 ・ テンプレートへ復帰 ${narration.counts.template}件 ・ 未処理 ${narration.counts.pending}件
+          ${narration.errors.length ? '<button class="btn" id="devLLMDetails">LLM検証の指摘を開く</button>' : ''}</p>
         <p>到達可能性：${rep.reach.reachable ? '<span class="good">全員に到達可能</span>' : '<span class="bad">到達不能あり</span>'} ・
           推理の段数 ${rep.reach.steps.length}（各段の解読数 ${rep.reach.perStep.join(' / ')}）</p>
-        <details><summary>段ごとの解読（ネタバレ）</summary><ol>${steps}</ol></details>
+        <details id="devReachSteps"><summary>段ごとの解読（ネタバレ）</summary><table class="data"><thead><tr><th>段</th><th>人数</th><th>解読できる人物・ID</th></tr></thead><tbody>${steps}</tbody></table></details>
+        <p>因果 ${rep.validation.truth ? 'PASS' : 'FAIL'} ／ 証拠からの推論 ${rep.validation.evidence ? 'PASS' : 'FAIL'} ／ 本文の掲載 ${rep.validation.text ? 'PASS' : 'FAIL'}</p>
+        <p>主観ログ ${rep.metrics.logs}件 ／ ${rep.metrics.characters}字 ／ 番号そのものの観察 ${rep.metrics.directNumbers}件 ／ 複数資料を要する結論 ${rep.metrics.multiSourceConclusions}件</p>
+        <details><summary>導出経路・仮説の更新（ネタバレ）</summary><pre class="trace">${esc(JSON.stringify(rep.trace, null, 2))}</pre></details>
         <details><summary>学習される文化のルール（ネタバレ）：${(rep.reach.rules || []).length} 個</summary>${devCulture(sc, rep)}</details>
         ${rep.errors.length ? `<pre class="errors">${esc(rep.errors.join('\n'))}</pre>` : ''}
         <details><summary>真相（ネタバレ）</summary>
@@ -847,6 +905,7 @@
 
   // 文化と、プレイヤーが学習できるルール（検証器パネル用。ネタバレ）
   function devCulture(sc, rep) {
+    if (sc.meta.generator === 'incident-v2') return `<pre>${esc(JSON.stringify(rep.reach.candidateRules, null, 2))}</pre>`;
     const cu = sc.culture;
     if (!cu) return '<p class="muted">文化の設定がない（古い形式）</p>';
     const label = (r) => {
@@ -870,42 +929,41 @@
   }
 
   function devLLMSection() {
-    if (!A.LLM || !A.LLM.isConfigured()) {
-      return `<div class="dev-section"><h3>LLM による文章化（§10）</h3>
-        <p>未設定。<code>js/config.local.example.js</code> を <code>js/config.local.js</code> にコピーし、OpenAI の API キーを書き込んでから再読み込みする。
-        <code>config.local.js</code> は .gitignore で git 管理外になっている。</p></div>`;
-    }
+    const configured = A.LLM.isConfigured();
     const s = A.LLM.settings();
     const rep = S.llmReport;
-    const pending = A.LLM.pendingCount(S.sc);
-    let detail = '<p class="muted">このセッションではまだ実行していない（キャッシュ済みの文章は自動で適用される）。</p>';
-    if (rep) {
-      const st = rep.stats;
-      const fb = rep.unresolved
+    const diagnostic = A.LLM.diagnostics(S.sc), counts = diagnostic.counts;
+    const pending = counts.pending;
+    const errors = S.sc.meta.generator === 'incident-v2' ? diagnostic.errors : rep?.specErrors || diagnostic.errors;
+    const fb = (rep?.unresolved || [])
         .map((f) => `<li><span class="mono">${f.owner} #${f.index}</span>：${rich(f.problems.slice(0, 3).join(' ／ '))}</li>`)
         .join('');
-      const spec = rep.specErrors
-        .map(
-          (f) => `<li><span class="mono">${f.owner} #${f.index}</span> ${esc(f.timestamp)} 〔${esc(f.codes.join(', '))}〕 場面 ${esc(f.scene.id)} ${esc(f.scene.place)}「${rich(f.scene.title)}」
-            <ul><li>必須：${f.required.map(rich).join(' ／ ') || '—'}</li><li>指摘：${f.problems.map(rich).join(' ／ ')}</li>${f.text ? `<li>最後の出力：${rich(f.text)}</li>` : ''}</ul></li>`,
-        )
+    const spec = errors
+        .map((f) => {
+          const entry = S.sc.documents.chip_logs[f.owner]?.[f.index];
+          const scene = f.scene || S.sc.story.scenes.find((s) => s.id === entry?.scene);
+          const sceneInfo = scene ? `場面 ${esc(scene.id)} ${esc(scene.place)}「${rich(scene.title)}」` : '場面情報なし';
+          const required = f.required || (entry ? (entry.draft || entry.text).split('\n') : []);
+          return `<li><span class="mono">${esc(f.owner)} #${esc(f.index)}</span> ${esc(f.timestamp || entry?.timestamp || '時刻不明')} 〔${esc(f.codes.join(', '))}〕 ${sceneInfo}
+            <ul><li>必須：${required.map(rich).join(' ／ ') || '—'}</li><li>指摘：${f.problems.map(rich).join(' ／ ')}</li>${f.text ? `<li>最後の出力：${rich(f.text)}</li>` : ''}</ul></li>`;
+        })
         .join('');
-      const byCode = {};
-      rep.specErrors.forEach((f) => f.codes.forEach((c) => (byCode[c] = (byCode[c] || 0) + 1)));
-      detail = `<p>LLM ${rep.llm}/${rep.entries} エントリ（今回キャッシュから ${rep.cached}）・ 未解決 ${rep.unresolved.length} ・ 仕様エラー ${rep.specErrors.length}
-        ・ 下書きとの重複率 ${rep.overlap == null ? '—' : (rep.overlap * 100).toFixed(1) + '%'}</p>
-        <p>API ${st.calls} 回 ・ トークン 入力 ${st.promptTokens} / 出力 ${st.completionTokens}
-        ・ 再送 ${st.retries} 回 ・ 日ごとの矛盾の指摘 ${rep.contradictions} 件 ・ 構造検証 ${rep.verification.pass ? '<span class="good">PASS</span>' : '<span class="bad">FAIL</span>'}</p>
-        <p>テンプレート文で確定したエントリ ${A.LLM.countEntries(S.sc).template} 件</p>
-        ${spec ? `<details><summary>仕様エラー（${rep.specErrors.length}：${esc(Object.entries(byCode).map(([c, n]) => `${c} ${n}`).join('、'))}）</summary><ul class="llm-fail">${spec}</ul></details>` : ''}
-        ${fb ? `<details><summary>直近の実行で検証に通らなかったエントリ（未解決 ${rep.unresolved.length}）</summary><ul>${fb}</ul></details>` : ''}`;
-    }
+    const byCode = {};
+    errors.forEach((f) => f.codes.forEach((c) => (byCode[c] = (byCode[c] || 0) + 1)));
+    const detail = `<p>LLM採用 ${counts.llm}/${counts.total}件 ・ テンプレートへ復帰 ${counts.template}件 ・ 未処理 ${pending}件</p>
+      ${diagnostic.records.length ? `<p>全文の生成対象 ${diagnostic.metrics.target}件 ・ 初回採用 ${diagnostic.metrics.initiallyAccepted}件 ・ 修正後を含む採用 ${diagnostic.metrics.accepted}件 ・ 復帰 ${diagnostic.metrics.fallback}件<br>真の意味変更・誤検知の人による確認：未実施。品質警告 ${diagnostic.metrics.qualityWarnings}件</p>` : ''}
+      ${rep ? `<p>今回の実行：不合格 ${rep.specErrors.length}件 ・ 未解決 ${rep.unresolved.length}件 ・ API ${rep.stats.calls}回
+        ・ トークン 入力 ${rep.stats.promptTokens} / 出力 ${rep.stats.completionTokens} ・ 再送 ${rep.stats.retries}回</p>`
+        : `<p class="muted">${counts.llm + counts.template ? 'エントリの結果と指摘は保存済みのデータから復元。前回のAPI呼び出し回数は保存していない。' : 'このシナリオのLLM文章化は未実施。'}</p>`}
+      ${spec ? `<details id="devLLMErrors"><summary>LLM検証の指摘（${errors.length}件：${esc(Object.entries(byCode).map(([c, n]) => `${c} ${n}`).join('、'))}）</summary><ul class="llm-fail">${spec}</ul></details>` : ''}
+      ${diagnostic.records.length ? `<details id="devLLMDiagnostics"><summary>生成入力・全文・抽出・引用・修正履歴（ネタバレ）</summary>${diagnostic.records.map((d) => `<details><summary>${esc(d.entryId)} ／ ${esc(d.origin)} ／ ${d.attempts.length}試行</summary><button class="btn" data-recheck="${esc(d.entryId)}">保存本文を再検査（生成APIは呼ばない）</button><pre class="trace">${esc(JSON.stringify(d, null, 2))}</pre></details>`).join('')}</details>` : ''}
+      ${fb ? `<details><summary>直近の実行で検証に通らなかったエントリ（未解決 ${rep.unresolved.length}）</summary><ul>${fb}</ul></details>` : ''}`;
     return `<div class="dev-section"><h3>LLM による文章化（§10）</h3>
-      <p>モデル <span class="mono">${esc(s.model)}</span>（検証 <span class="mono">${esc(s.verifyModel)}</span>）・ 未処理 ${pending} エントリ ・ 自動実行 ${s.autoNarrate ? 'オン' : 'オフ'}</p>
+      ${configured ? `<p>モデル <span class="mono">${esc(s.model)}</span>（検証 <span class="mono">${esc(s.verifyModel)}</span>）・ 自動実行 ${s.autoNarrate ? 'オン' : 'オフ'}</p>` : '<p>API未設定。文章化する場合は js/config.local.example.js を js/config.local.js へコピーして設定する。</p>'}
       ${detail}
       <div class="dev-row">
-        <button class="btn" id="devLLMRun"${pending ? '' : ' disabled'}>未処理分を文章化</button>
-        <button class="btn" id="devLLMRedo">キャッシュを消して作り直す</button>
+        <button class="btn" id="devLLMRun"${configured && pending ? '' : ' disabled'}>未処理分を文章化</button>
+        <button class="btn" id="devLLMRedo"${configured ? '' : ' disabled'}>キャッシュを消して作り直す</button>
         <button class="btn" id="devLLMRevert">テンプレート文に戻す</button>
       </div></div>`;
   }
@@ -927,7 +985,7 @@
         rows.push(`<tr><td class="num">${s}</td><td class="bad">FAIL</td><td colspan="6">${esc(e.message)}</td></tr>`);
       }
     }
-    $('#batchOut').innerHTML = `<p>${pass}/${count} 本が到達可能性・一意性・往復検証を通過（${Math.round(performance.now() - t0)}ms）</p>
+    $('#batchOut').innerHTML = `<p>${pass}/${count} 本が因果・到達可能性・一意性・本文検査を通過（${Math.round(performance.now() - t0)}ms）</p>
       <div class="table-wrap" style="padding:0"><table class="data" style="max-width:none">
       <tr><th>シード</th><th>結果</th><th>試行</th><th>住人</th><th>段数</th><th>危機</th><th>トリック</th><th>判定</th></tr>${rows.join('')}</table></div>`;
   }
@@ -958,7 +1016,7 @@
         alert(`シナリオの形式が不正です：${e.message}`);
         return;
       }
-      if (!report.pass && !confirm(`検証に失敗しました：\n${report.errors.slice(0, 5).join('\n')}\n\nそれでも読み込みますか？`)) return;
+      if (!report.pass) { alert(`読み込めません：\n${report.errors.slice(0, 5).join('\n')}`); return; }
       S.source = 'json';
       setScenario(sc, report);
       $('#devDlg').close();
@@ -989,6 +1047,23 @@
       const o = e.target.closest('.occ li[data-doc]');
       if (o) openDoc(o.dataset.doc, Number(o.dataset.idx));
       if (e.target.matches('[data-close]')) e.target.closest('dialog').close();
+      const pin = e.target.closest('[data-pin]');
+      if (pin && visibleEntries().some((x) => x.ref === pin.dataset.pin)) {
+        const ref = pin.dataset.pin;
+        S.pins = S.pins.includes(ref) ? S.pins.filter((r) => r !== ref) : S.pins.concat(ref);
+        S.comparison = S.pins.slice(-2); saveProgress(); renderViewer(); renderPeople();
+      }
+      const evidence = e.target.closest('[data-evidence]');
+      if (evidence && S.selTok && visibleEntries().some((x) => x.ref === evidence.dataset.evidence)) {
+        const draft = S.drafts[S.selTok] = S.drafts[S.selTok] || {};
+        draft.evidence = [...new Set((draft.evidence || []).concat(evidence.dataset.evidence))];
+        saveProgress(); renderPeople();
+      }
+      const jump = e.target.closest('[data-jump]'); if (jump) jumpTo(jump.dataset.jump);
+      if (e.target.id === 'btnFilter') {
+        S.filters = { text: $('#timelineText').value, day: $('#timelineDay').value };
+        saveProgress(); renderViewer();
+      }
     });
     document.addEventListener('input', (e) => {
       if (e.target.id === 'memo') {
@@ -996,17 +1071,42 @@
         if (!e.target.value) delete S.memos[S.selTok];
         saveProgress();
       }
+      if (e.target.dataset.draft && S.selTok) {
+        const draft = S.drafts[S.selTok] = S.drafts[S.selTok] || {};
+        draft[e.target.dataset.draft] = e.target.value;
+        if (draft.district && draft.order && draft.job) $('#idInput').value = `${draft.district}-${draft.order}-${draft.job}`;
+        saveProgress();
+      }
     });
-    $('#tokDetail').addEventListener('change', () => renderPeople());
+    $('#tokDetail').addEventListener('change', (e) => {
+      if (e.target.dataset.hypothesis && S.selTok && !S.confirmed[S.selTok]) {
+        const answer = S.answers.people[S.selTok] = S.answers.people[S.selTok] || {};
+        answer[e.target.dataset.hypothesis] = e.target.value; saveProgress();
+      }
+      if (e.target.dataset.draft === 'nickname' && S.selTok) {
+        const r = S.byTok.get(S.selTok);
+        if (!S.unlocked.has(r.id)) $$('.tok[data-tok]').filter((el) => el.dataset.tok === S.selTok)
+          .forEach((el) => { el.textContent = `${S.drafts[S.selTok]?.nickname || ''} ⟨${S.selTok}⟩`.trim(); });
+      }
+    });
+    $('#viewer').addEventListener('change', (e) => {
+      if (e.target.dataset.compare != null) { S.comparison[Number(e.target.dataset.compare)] = e.target.value; saveProgress(); renderViewer(); }
+    });
+    $('#btnReconnect').addEventListener('click', () => {
+      if (A.Investigation.reconnect(S)) { term('info', '再接続した。資料とメモを保持して認証を再開。'); saveProgress(); renderAll(); }
+    });
+    $('#btnConfirm').addEventListener('click', confirmAnswers);
     $('#btnAnswer').addEventListener('click', openAnswer);
     $('#answerDlg').addEventListener('change', onAnswerChange);
     $('#btnSubmit').addEventListener('click', submitAnswer);
     $('#btnNew').addEventListener('click', () => {
       if (S.unlockOrder.length && !S.over && !confirm('新しいシナリオを始めますか？（今の進行状況は保存されています）')) return;
+      const params = new URLSearchParams(location.search); params.delete('scenario'); history.replaceState(null, '', `?${params}`);
       startSeed(randomSeed());
     });
     $('#btnNext').addEventListener('click', () => {
       $('#resultDlg').close();
+      const params = new URLSearchParams(location.search); params.delete('scenario'); history.replaceState(null, '', `?${params}`);
       startSeed(randomSeed());
     });
     $('#btnRetry').addEventListener('click', () => {
@@ -1021,10 +1121,22 @@
     $('#devDlg').addEventListener('click', (e) => {
       if (e.target.id === 'devGen') {
         $('#devDlg').close();
+        const params = new URLSearchParams(location.search); params.delete('scenario');
+        params.set('size', $('#devSize').value); params.set('mode', $('#devMode').value);
+        history.replaceState(null, '', `?${params}`);
         startSeed(Number($('#devSeed').value) || 1);
+      } else if (e.target.id === 'devFixed') {
+        $('#devDlg').close(); const params = new URLSearchParams(location.search);
+        params.set('scenario', 'fixed'); params.set('mode', $('#devMode').value); history.replaceState(null, '', `?${params}`);
+        startSeed(730);
       } else if (e.target.id === 'devRand') {
         $('#devSeed').value = randomSeed();
       } else if (e.target.id === 'devExport') exportJSON();
+      else if (e.target.id === 'devLLMDetails') {
+        const details = $('#devLLMErrors');
+        if (details) { details.open = true; details.scrollIntoView({ block: 'start' }); }
+      }
+      else if (e.target.dataset.recheck) recheckNarration(e.target.dataset.recheck, e.target);
       else if (e.target.id === 'devBatch') runBatch();
       else if (e.target.id === 'devLLMRun') {
         $('#devDlg').close();
@@ -1033,11 +1145,13 @@
         if (!confirm('このシナリオの LLM 文章のキャッシュを消して、すべて作り直しますか？（API を再度呼び出します）')) return;
         A.LLM.clearCache(S.sc);
         A.LLM.revertToTemplate(S.sc);
+        S.llmReport = null;
         $('#devDlg').close();
         renderAll();
         runNarration();
       } else if (e.target.id === 'devLLMRevert') {
         A.LLM.revertToTemplate(S.sc);
+        S.llmReport = null;
         renderAll();
         openDev();
       }
@@ -1057,6 +1171,23 @@
     $('#devDlg').addEventListener('change', (e) => {
       if (e.target.id === 'devImport' && e.target.files[0]) importJSON(e.target.files[0]);
     });
+  }
+
+  async function recheckNarration(entryId, button) {
+    const sc = S.sc, [owner, index] = entryId.split('#'), entry = sc.documents.chip_logs[owner]?.[Number(index)];
+    if (!entry?.narrationDiagnostic || !A.LLM.isConfigured()) return;
+    button.disabled = true; button.textContent = '保存本文の意味を再検査中…';
+    try {
+      const result = await A.Narration.recheck(sc, entry.narrationDiagnostic);
+      if (S.sc !== sc) return;
+      S.llmReport = null;
+      term(result.result.pass ? 'ok' : 'warn', `保存本文の再検査 ${entryId}：${result.result.pass ? '採用' : '不採用'}（生成APIなし、検証API ${result.stats.calls}回）`);
+      if (result.invalidated.length) term('info', `参照先の本文が変わったため、後続 ${result.invalidated.length}件を再処理対象へ戻した。「未処理分を文章化」で再検査できる。`);
+      saveProgress(); renderAll(); openDev();
+    } catch (error) {
+      term('err', `再検査に失敗：${error.message}`);
+      button.disabled = false; button.textContent = '保存本文を再検査（生成APIは呼ばない）';
+    }
   }
 
   document.addEventListener('DOMContentLoaded', boot);

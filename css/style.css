@@ -45,6 +45,7 @@ h2, h3 { margin: 0; font-weight: 600; }
 .conn b { color: var(--text); font-weight: 600; }
 .narr-info { font: 12px var(--mono); color: var(--dim); }
 .narr-info .llm { color: var(--ok); }
+.narr-info .fallback { color: var(--warn); }
 .llm-body { padding: 4px 18px 12px; width: min(560px, 90vw); }
 .llm-fail { max-height: 260px; overflow-y: auto; font-size: 13px; padding-left: 1.2em; }
 .llm-fail > li { margin-bottom: 8px; }
@@ -270,3 +271,19 @@ summary { cursor: pointer; color: var(--accent); }
 .dev-section { margin-top: 18px; }
 .dev-section h3 { font: 600 12px var(--mono); letter-spacing: 0.12em; color: var(--dim); margin-bottom: 6px; }
 pre.errors { white-space: pre-wrap; color: var(--bad); font: 12px var(--mono); }
+.entry-text { white-space: pre-line; }
+.entry-actions { margin-left: auto; display: inline-flex; gap: 4px; flex-wrap: wrap; }
+.entry-actions .btn { font-size: 11px; padding: 3px 6px; }
+.hypotheses { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin: 12px 0; }
+.hypotheses label { display: grid; gap: 4px; font-size: 12px; color: var(--dim); }
+.hypotheses input, .hypotheses select { width: 100%; min-width: 0; padding: 5px; color: var(--text); background: #070a09; border: 1px solid var(--line); }
+.timeline-filters, .compare-select { display: flex; gap: 8px; flex-wrap: wrap; align-items: end; }
+.timeline-filters label { display: grid; gap: 4px; }
+.timeline-filters input { padding: 6px; background: var(--panel); color: var(--text); border: 1px solid var(--line); }
+.comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.comparison .entry { border: 1px solid var(--accent); padding: 10px; min-width: 0; }
+.confirmed { background: #153127; }
+pre.trace { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12px; }
+.llm-atmosphere { color: var(--dim); font-style: italic; }
+.machine-record { margin-top: 10px; padding: 8px 12px; border: 1px solid var(--line); color: var(--dim); font-size: 13px; }
+@media (max-width: 800px) { .comparison { grid-template-columns: 1fr; } .dlg-foot { flex-wrap: wrap; } }

@@ -1,4 +1,70 @@
-# 漁り屋（ASARIYA）— シェルター推理ゲーム 試作版
+# 漁り屋（ASARIYA）— 事件を再構成するシェルター推理ゲーム v2.1
+
+`docs/ai/FIXES.md` に沿った改善版。身元の解読で開いた記録を、既読の発言・操作・身体の観察と照合する。標準8〜10人、相談役2人、主観ログ約40〜55件。HTML/CSS/JavaScriptだけで動き、ゲームにnpm・サーバー・APIキーは不要。
+
+## 起動
+
+`index.html` をブラウザで開く。URL末尾で次を指定できる。「検証器」の生成欄でも固定版・規模・モードを選べる。
+
+| URL | 内容 |
+|---|---|
+| `index.html?scenario=fixed` | 8人の基準シナリオ「灯台」 |
+| `index.html?seed=1` | 設備操作と専用鍵の照合 |
+| `index.html?seed=2` | 配給の対立、接触と手袋の照合 |
+| `index.html?seed=3` | 投与量、身体の死とチップの再接続 |
+| `index.html?seed=7` | 設備事件に侵入者の入場・襲撃を組み合わせた例 |
+| `index.html?seed=3&size=large` | 12〜16人版 |
+| `index.html?seed=1&mode=hard` | 誤認証上限で接続遮断・真相開示するハード版 |
+
+同じシード・形式・設定は同じ生成結果になる。固定版はシード730の専用設定。古い形式のJSONは拒否し、現行版での再生成を案内する。
+
+## 調査の操作
+
+相談役の会話と主観ログが入口。職能コード表、概要の「支給品と受付の規定」を参照し、伏せ字をクリックして人物の仮の名前、区画・入居順・職能候補、自由メモを記録する。候補をそろえるとID入力へ反映される。生死・死因・加害者の下書きは最終回答と共通。
+
+各記録の「ピン留め」で資料比較へ送れる。「この人物の根拠へ」は選択中の人物へ出典を紐付ける。「時系列・資料比較」では2件の同時表示、日付・人物・仮の名前・本文による検索、元の記録への移動ができる。検索対象は閲覧可能な資料だけ。
+
+標準モードは誤認証8回で認証を一時停止する。「再接続」で即再開でき、資料・メモ・拒否済みIDは保持する。同じ拒否済みIDと形式エラーに追加加算はない。認証はそのIDの存在を確認するための操作で、選択人物との対応は別に確認する。成功したIDが別トークンなら端末に通知する。
+
+「最終回答」の途中確認は、解読済み人物について生死・死因・必要な加害者が正しい3人分をまとめて確定する。加害者も解読済みであることが条件。項目ごとの正誤は教えない。最終提出で真相を開示する。進行、メモ、下書き、ピン、比較、途中確定、再接続回数を形式別に自動保存する。
+
+## 検証
+
+Node 22以降。ブラウザ検査以外は追加ライブラリ不要。
+
+```sh
+npm test
+node tools/batch-check.js 1 100 --report docs/ai/validation.json
+node tools/batch-check.js --fixed
+node tools/batch-check.js 1 20 --large
+node tools/batch-check.js --dump 3
+```
+
+`--trace` を加えると全シードの導出経路も保存する。通常のJSONレポートは全シードの結果・指標と各型の代表例の導出経路を含む。画面の検証器でも現在の全人物と安全判定の出典を確認できる。
+
+作者によるブラウザ操作検査は `npm ci` の後、Chromeがあれば `npm run test:browser`。Edgeなら `ASARIYA_BROWSER=msedge` を環境変数に設定する。ヘッドレスの `file://` で実行し、ローカルAPI設定と外部通信を無効にする。結果と画像は `test-results/` に保存する。
+
+現行の文章生成・実API検証と具体例は [docs/ai/NARRATION.md](docs/ai/NARRATION.md)、ゲーム全体の導出例は [docs/ai/IMPLEMENTATION.md](docs/ai/IMPLEMENTATION.md)、現行テンプレートのシードごとの結果は [docs/ai/validation.json](docs/ai/validation.json)。正解を知らない人によるプレイ確認は未実施。
+
+## LLMと実装
+
+API未設定なら検証済みのテンプレートで最後まで遊べる。任意で `js/config.local.example.js` を `js/config.local.js` へコピーし設定する。v2.1では構造化した必須証拠、人物設定、前の経過と知覚範囲を渡して主観ログ全文を生成する。別の呼び出しが本文から証拠を抽出し、さらに引用と意味を監査して人物・値・時刻・否定・情報源を比較する。自然な言い換えや本人の感情は許可し、論理に影響する変更は局所修正2回まで。それでも不合格なら同じ証拠のテンプレートへ戻す。自由文の意味検証にはLLMの判断が含まれ、数学的保証ではない。
+
+検証器には本文・入力・抽出・引用・人物参照対応・各修正試行を保存し、「保存本文を再検査」で生成APIを呼ばずに抽出と監査だけをやり直せる。現行形式は2.1で、以前の本文・進行・キャッシュは混ぜない。ローカルのモデル設定は維持している。
+
+```sh
+node tools/narration-check.js --report test-results/narration-stub.json
+node tools/narration-check.js --real --report test-results/narration-real.json
+node tools/narration-check.js --real --recheck test-results/narration-real.json --report test-results/narration-recheck.json
+```
+
+`--real` は設定済みAPIを呼ぶ。既定は代表10エントリ、`--all` は全エントリ、`--seed 3` はランダム版。スタブの成功率は実AIの精度として数えない。
+
+論理は `js/scenarios.js`（事件生成）、`js/evidence.js`（観察の文章化と本文抽出）、`js/inference.js`（文化候補・身元・事件・因果・三種類の検証）へ分離した。`js/investigation.js` はUIとテストが共用する状態遷移。既存のCSPを再利用し、旧生成器・旧物語の実装は開発用の履歴として残す。詳細は [DESIGN.md](docs/ai/DESIGN.md) と [SPEC.md](docs/ai/SPEC.md)。
+
+---
+
+## 旧プロトタイプの記録（以下はv2の現行仕様ではない）
 
 [docs/ai/DESIGN.md](docs/ai/DESIGN.md) の設計書に基づく HTML プロトタイプ。
 

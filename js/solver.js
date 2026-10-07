@@ -603,5 +603,6 @@
   }
 
   A.Solver = { solve, uniqueVars, buildCSP, ID_TYPES, OBS_TYPES, DIRECT_TYPES, learnRules, deriveFromObservations };
-  A.Verifier = { verify, simulateReach, deriveOutcome, verifyCanon, verifyCauseInvariants };
+  A.LegacyVerifier = { verify, simulateReach, deriveOutcome, verifyCanon, verifyCauseInvariants };
+  A.Verifier = A.LegacyVerifier;
 })(window.ASARIYA = window.ASARIYA || {});
